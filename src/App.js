@@ -4,7 +4,8 @@ import Root from './scenes/Root';
 import ManagePacks from './scenes/ManagePacks';
 import ManageJars from './scenes/ManageJars';
 import AddLicense from './scenes/AddLicense';
-import DownloadLicense from './scenes/GenerateLicense';
+import GenerateLicense from './scenes/GenerateLicense';
+import frontPage from './scenes/InitialPage'
 // import './App.css';
 
 class App extends Component {
@@ -14,10 +15,9 @@ class App extends Component {
             <Route path={'/app'} component={Root} >
                 <Route path={'managePacks'} component={ManagePacks} />
                 <Route path={'manageJars'} component={ManageJars} />
-                <Route path={'generateLicense'} component={DownloadLicense} />
+                <Route path={'licenseGenerator'} component={GenerateLicense} />
                 <Route path={'licenseAdder'} component={AddLicense} />
-                {/*<Route path={'downloader'} component={DownloadLicense}/>*/}
-                <Route path={'/'} component={ManagePacks} />
+                <Route path={'/'} component={frontPage} />
             </Route>
         </Router>
     );

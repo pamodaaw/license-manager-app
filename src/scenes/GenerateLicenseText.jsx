@@ -14,7 +14,6 @@ import {
     Stepper,
     StepLabel,
 } from 'material-ui/Stepper';
-import {List, ListItem} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -22,35 +21,31 @@ import FlatButton from 'material-ui/FlatButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import ErrorIcon from 'material-ui/svg-icons/alert/error';
-import {red500} from 'material-ui/styles/colors';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
 import textFile from '../assets/images/txt-file.png';
 
 /**
- * @class NameErrorJarsLicense
+ * @class GenerateLicense
  * @extends {Component}
  * @description Get user details
  */
 class GenerateLicense extends Component {
     /**
-     * @class NameErrorJarsLicense
+     * @class GenerateLicense
      * @extends {Component}
      * @param {any} props props for constructor
-     * @description Sample React component
+     * @description Generate License text and download.
      */
     constructor(props) {
         super(props);
         this.state = {
             packName: props.location.query.selectedPack,//eslint-disable-line
-
             userEmail: props.location.query.userEmail,//eslint-disable-line
             nameMissingJars: [],
             nameJars: [],
-            open: false,
+            openSaveData: false,
             openError: false,
-            openSuccess: false,
             openLicense: false,
             confirmLicense: false,
             errorIcon: '',
@@ -75,12 +70,10 @@ class GenerateLicense extends Component {
         this.handleAddLicense = this.handleAddLicense.bind(this);
         this.handleComponentSelect = this.handleComponentSelect.bind(this);
         this.handleLibrarySelect = this.handleLibrarySelect.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
+        this.handleOpenSaveData = this.handleOpenSaveData.bind(this);
+        this.handleCloseSaveDate = this.handleCloseSaveDate.bind(this);
         this.handleOpenError = this.handleOpenError.bind(this);
         this.handleCloseError = this.handleCloseError.bind(this);
-        this.handleOpenSuccess = this.handleOpenSuccess.bind(this);
-        this.handleCloseSuccess = this.handleCloseSuccess.bind(this);
         this.handleOpenConfirm = this.handleOpenConfirm.bind(this);
         this.handleCloseConfirm = this.handleCloseConfirm.bind(this);
         this.handleNext = this.handleNext.bind(this);
@@ -119,7 +112,12 @@ class GenerateLicense extends Component {
                 this.handleOpenError();
             }
         }).catch((error) => {
-            throw new Error(error);
+            this.setState(() => {
+                return {
+                    errorMessage: "Oops.. Something went wrong",
+                };
+            });
+            this.handleOpenError();
         });
         ServiceManager.extractJars(this.state.packName).then((response) => {
             if (response.data.responseType === 'Done') {
@@ -133,7 +131,7 @@ class GenerateLicense extends Component {
                                 this.setState(() => {
                                     return {
                                         nameMissingJars: response.data.responseData,
-                                        nameJars: response.data.responseData,
+                                        nameDefinedJars: response.data.responseData,
                                         displayProgress: 'none',
                                         displayStatus: 'none',
                                         displayForm: 'block',
@@ -149,6 +147,13 @@ class GenerateLicense extends Component {
 
                                 };
                             });
+                        }else {
+                            this.setState(() => {
+                                return {
+                                    errorMessage: response.data.responseMessage,
+                                };
+                            });
+                            this.handleOpenError();
                         }
                     }).catch((error) => {
                         throw new Error(error);
@@ -166,7 +171,12 @@ class GenerateLicense extends Component {
 
             }
         }).catch((error) => {
-            throw new Error(error);
+            this.setState(() => {
+                return {
+                    errorMessage: "Oops.. Something went wrong",
+                };
+            });
+            this.handleOpenError();
         });
 
     }
@@ -176,7 +186,6 @@ class GenerateLicense extends Component {
      * go back to request
      */
     setVersion(e) {
-        // const id = parseInt(e.target.name, 10);
         const versionValue = e.target.value;
         const nameJarsList = this.state.nameJars.map((jar, i) => {
             const jarFile = {
@@ -188,7 +197,7 @@ class GenerateLicense extends Component {
         });
         this.setState(() => {
             return {
-                nameJars: nameJarsList,
+                nameDefinedJars: nameJarsList,
             };
         });
     }
@@ -209,7 +218,7 @@ class GenerateLicense extends Component {
         });
         this.setState(() => {
             return {
-                nameJars: nameJarsList,
+                nameDefinedJars: nameJarsList,
             };
         });
     }
@@ -222,7 +231,6 @@ class GenerateLicense extends Component {
                         return {
                             displayDownload: 'block',
                             displayFormLicense: 'none',
-                            displayLoader: 'none',
                             displayProgress: 'none',
                             header: 'Download License Here',
                             licenseMissingComponents: responseNxt.data.component,
@@ -234,7 +242,6 @@ class GenerateLicense extends Component {
                     this.setState(() => {
                         return {
                             displayFormLicense: 'block',
-                            displayLoader: 'none',
                             displayProgress: 'none',
                             header: 'Select License for these JARs',
                             licenseMissingComponents: responseNxt.data.component,
@@ -244,15 +251,12 @@ class GenerateLicense extends Component {
                     });
                 }
             } else {
-                this.handleOpenError();
                 this.setState(() => {
                     return {
-                        displayFormLicense: 'none',
-                        displayProgress: 'none',
-                        displayLoader: 'none',
-                        header: 'Unknown Error occured.',
+                        errorMessage: responseNxt.data.responseMessage,
                     };
                 });
+                this.handleOpenError();
             }
         }).catch((error) => {
             throw new Error(error);
@@ -271,7 +275,7 @@ class GenerateLicense extends Component {
         this.setState(() => {
             return {
                 displayForm: 'none',
-                displayLoader: 'block',
+                displayProgress: 'block',
             };
         });
 
@@ -297,14 +301,18 @@ class GenerateLicense extends Component {
                     return {
                         displayDownload: 'block',
                         displayFormLicense: 'none',
-                        displayLoader: 'none',
                         displayProgress: 'none',
                         header: 'Download License Here',
                         stepIndex: 3,
                     };
                 });
             } else {
-                console.log("error while adding license license");
+                this.setState(() => {
+                    return {
+                        errorMessage: response.data.responseMessage,
+                    };
+                });
+                this.handleOpenError();
             }
         }).catch((error) => {
             throw new Error(error);
@@ -323,7 +331,7 @@ class GenerateLicense extends Component {
             return {
                 displayForm: 'none',
                 displayDownload: 'none',
-                displayLoader: 'block',
+                displayProgress: 'block',
             };
         });
         /* eslint-disable */
@@ -341,7 +349,7 @@ class GenerateLicense extends Component {
                     return {
                         displayForm: 'none',
                         displayDownload: 'block',
-                        displayLoader: 'none',
+                        displayProgress: 'none',
                     };
                 });
             }).catch((error) => {
@@ -359,13 +367,13 @@ class GenerateLicense extends Component {
      * handle open
      * @param {any} e event
      */
-    handleOpen(e) {
+    handleOpenSaveData(e) {
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         this.setState(() => {
             return {
-                open: true,
+                openSaveData: true,
             };
         });
     }
@@ -373,10 +381,10 @@ class GenerateLicense extends Component {
     /**
      * handle close
      */
-    handleClose() {
+    handleCloseSaveDate() {
         this.setState(() => {
             return {
-                open: false,
+                openSaveData: false,
             };
         });
     }
@@ -419,55 +427,6 @@ class GenerateLicense extends Component {
         });
     }
 
-    /**
-     * handle open
-     */
-    handleOpenSuccess() {
-        this.setState(() => {
-            return {
-                openSuccess: true,
-            };
-        });
-    }
-
-    /**
-     * handle close
-     */
-    handleCloseSuccess() {
-        this.setState(() => {
-            return {
-                openSuccess: false,
-            };
-        });
-    }
-
-    /**
-     * handle Next
-     */
-    handleNext() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo += 1;
-        this.setState(() => {
-            return {
-                stepIndex: stepIndexNo,
-            };
-        });
-    }
-
-    /**
-     * handle Prev
-     */
-    handlePrev() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo -= 1;
-        if (this.state.stepIndex > 0) {
-            this.setState(() => {
-                return {
-                    stepIndex: 0,
-                };
-            });
-        }
-    }
 
     /**
      * reload page
@@ -552,7 +511,7 @@ class GenerateLicense extends Component {
             <FlatButton
                 label="No"
                 primary={true}
-                onClick={this.handleClose}
+                onClick={this.handleCloseSaveDate}
             />,
             <FlatButton
                 label="Yes"
@@ -616,7 +575,7 @@ class GenerateLicense extends Component {
         /* eslint-enable */
         if (this.state.nameMissingJars.length > 0) {
             /* eslint-disable */
-            let i = 0;
+            let i;
             const jars = this.state.nameMissingJars;
             for (i = 0; i < jars.length; i++) {
                 table.push(
@@ -719,7 +678,7 @@ class GenerateLicense extends Component {
                         <StepLabel>Download License</StepLabel>
                     </Step>
                 </Stepper>
-                <form onSubmit={this.handleOpen} style={{display: this.state.displayForm}}>
+                <form onSubmit={this.handleOpenSaveData} style={{display: this.state.displayForm}}>
                     <Table>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow key={0}>
@@ -752,7 +711,6 @@ class GenerateLicense extends Component {
                         />
                     </div>
                 </form>
-                {/* eslint-disable max-len */}
                 <form onSubmit={this.handleOpenConfirm} style={{display: this.state.displayFormLicense}}>
                     <div style={{display: displayComponent}}>
                         <Subheader style={styles.subHeader}>Components</Subheader>
@@ -820,7 +778,6 @@ class GenerateLicense extends Component {
                         backgroundColor='#2196F3'
                         disabled={this.state.buttonState}
                     />
-                    &nbsp;
                     <RaisedButton
                         type="button"
                         label="Back to main"
@@ -830,51 +787,6 @@ class GenerateLicense extends Component {
                         backgroundColor='#BDBDBD'
                     />
                 </form>
-                <div className="container-fluid" style={{display: this.state.displayLoader}}>
-                    <br/><br/>
-
-
-                    <br/>
-                    <div className="row">
-                        <div className="col-lg-5"/>
-                        <div className="col-lg-4">
-                            <CircularProgress color="#f47c24" size={100} thickness={7}/>
-                            <div className="12" style={{
-                                float: 'left',
-                                padding: '20px',
-                                color: '#d62c1a',
-                                marginBottom: '15px'
-                            }}>
-                                <strong>Status: </strong>{this.state.statusMessage}
-
-                            </div>
-                        </div>
-                        <div className="col-lg-3"/>
-                    </div>
-                </div>
-
-                <div className="container-fluid" style={{display: this.state.displayErrorBox}}>
-                    <br/><br/><br/>
-                    <List style={styles.list}>
-                        <ListItem
-                            style={styles.listItem}
-                            leftIcon={<ErrorIcon color={red500}/>}
-                            primaryText="Error! license missing libraries exists"
-                            secondaryText="License Approval request is sent to Admin. If the licenses are accepted, LICENSE.TXT will be sent via an email."
-                        />
-                    </List>
-                </div>
-
-                <Dialog
-                    title="Success"
-                    actions={actionsSuccess}
-                    modal={false}
-                    open={this.state.openSuccess}
-                    onRequestClose={this.reloadPage}
-                >
-                    The request has been successfully submited for approval via e-mail
-                </Dialog>
-
                 <Dialog
                     title="Error"
                     actions={actionsError}

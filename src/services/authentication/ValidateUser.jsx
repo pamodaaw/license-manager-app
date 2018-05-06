@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios';
 import MainData from '../MainData';
-// import Token from './Token';
 
 /**
 * @class ValidateUser
@@ -10,7 +9,7 @@ import MainData from '../MainData';
 */
 class ValidateUser extends Component {
     /**
-    * get valid user details
+    * Get valid user details
     * @returns {Promise} promise
     */
     getUserDetails() {
@@ -19,7 +18,7 @@ class ValidateUser extends Component {
         return axios.get(url, requestHeaders).then((response) => {
             return response.data;
         }).catch((error) => {
-            return "unknown";
+            throw error;
         });
     }
 }

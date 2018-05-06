@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Link, hashHistory} from 'react-router';
+import {Link, hashHistory, withRouter} from 'react-router';
 import {
     Table,
     TableHeader,
@@ -20,45 +20,40 @@ import FlatButton from 'material-ui/FlatButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
+import * as router from "react-router";
+import {Paper} from "material-ui";
+import StepComponent from "../components/StepComponent";
+import ProgressComponent from "../components/ProgressComponent";
+import HeaderComponent from "../components/HeaderComponent";
 
 /**
- * @class NameErrorJarsLicense
+ * @class ManageJars
  * @extends {Component}
- * @description Get user details
+ * @description Get the name and version missing jars for the pack and take the user input for name and version.
  */
 class ManageJars extends Component {
-    /**
-     * @class NameErrorJarsLicense
-     * @extends {Component}
-     * @param {any} props props for constructor
-     * @description Sample React component
-     */
+
     constructor(props) {
         super(props);
         this.state = {
             packName: props.location.query.selectedPack,//eslint-disable-line
-
-            userEmail: props.location.query.userEmail,//eslint-disable-line
+            header: 'Define name and version of jars',
             nameMissingJars: [],
-            nameJars: [],
-            open: false,
+            // nameDefinedJars: [],
+            openSaveData: false,
             openError: false,
-            errorIcon: '',
+            buttonState: false,
             displayProgress: 'block',
             displayStatus: 'none',
             displayForm: 'none',
-            displayLoader: 'none',
-            displayErrorBox: 'none',
-            buttonState: false,
-            header: 'Please add Name and Version for following JARs',
             stepIndex: 1,
             errorMessage: '',
             statusMessage: ''
         };
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleOpenError = this.handleOpenError.bind(this);
-        this.handleCloseError = this.handleCloseError.bind(this);
+        this.handleOpenSaveData = this.handleOpenSaveData.bind(this);
+        this.handleCloseSaveData = this.handleCloseSaveData.bind(this);
+        this.openError = this.openError.bind(this);
+        this.closeError = this.closeError.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
         this.setName = this.setName.bind(this);
         this.setVersion = this.setVersion.bind(this);
@@ -66,26 +61,26 @@ class ManageJars extends Component {
         this.redirectToNext = this.redirectToNext.bind(this);
     }
 
-    /**
-     * @class NameErrorJarsLicense
-     * @extends {Component}
-     * @description componentWillMount
-     */
     componentWillMount() {
 
         ServiceManager.extractJars(this.state.packName).then((response) => {
             if (response.data.responseType === 'Done') {
+                this.setState(() => {
+                    return {
+                        statusMessage: response.data.responseMessage,
+                        displayStatus: 'block',
+                    };
+                });
                 let intervalID = setInterval(function () {
-
-                    ServiceManager.checkProgress().then((response) => {
-                        if (response.data.responseStatus === "complete") {
-                            if (response.data.responseData.length === 0) {
+                    ServiceManager.checkProgress().then((responseNext) => {
+                        if (responseNext.data.responseStatus === "complete") {
+                            if (responseNext.data.responseData.length === 0) {
                                 this.redirectToNext();
                             } else {
                                 this.setState(() => {
                                     return {
-                                        nameMissingJars: response.data.responseData,
-                                        nameJars: response.data.responseData,
+                                        nameMissingJars: responseNext.data.responseData,
+                                        // nameDefinedJars: response.data.responseData,
                                         displayProgress: 'none',
                                         displayStatus: 'none',
                                         displayForm: 'block',
@@ -93,124 +88,108 @@ class ManageJars extends Component {
                                 });
                             }
                             clearTimeout(intervalID);
-                        } else if (response.data.responseStatus === "running") {
+                        } else if (responseNext.data.responseStatus === "running") {
                             this.setState(() => {
                                 return {
-                                    statusMessage: response.data.responseMessage,
+                                    statusMessage: responseNext.data.responseMessage,
                                     displayStatus: 'block',
 
                                 };
                             });
+                        } else {
+                            this.handleError(responseNext.data.responseMessage)
                         }
                     }).catch((error) => {
-                        throw new Error(error);
+                        this.handleError("Network Error")
                     });
 
                 }.bind(this), 5000);
 
             } else {
-                this.setState(() => {
-                    return {
-                        errorMessage: response.data.responseMessage,
-                    };
-                });
-                this.handleOpenError();
-
+                this.handleError(response.data.responseMessage);
             }
-        }).catch((error) => {
-            throw new Error(error);
+        }).catch(() => {
+
+            // this.setState(() => {
+            //     return {
+            //         nameMissingJars:             [{"index":0,"name":"patcsssssssssssssssssssssssh.jar","version":"patch.jar"}],
+            //
+            //         // nameDefinedJars: response.data.responseData,
+            //         displayProgress: 'none',
+            //         displayStatus: 'block',
+            //         displayForm: 'block',
+            //     };
+            // });
+
+            this.handleError("Network Error");
         });
 
-    }
-
-    redirectToNext() {
-
-        // this.state.redirectTo = true;
-        // this.props.history.push('/apps/licenseAdder');
-
-        this.props.router.push({
-            pathname: '/apps/licenseAdder',
-            state: {
-                userEmail: this.state.username,
-                nameMissingJars: this.state.nameJars
-            }
-        });
     }
 
     /**
-     * @param {any} e event
-     * go back to request
+     * For all errors display customized message.
+     * @param message
      */
-    setVersion(e) {
-        // const id = parseInt(e.target.name, 10);
-        const versionValue = e.target.value;
-        const nameJarsList = this.state.nameJars.map((jar, i) => {
-            const jarFile = {
-                index: i,
-                name: jar.name,
-                version: versionValue,
-            };
-            return (jarFile);
-        });
+    handleError(message) {
         this.setState(() => {
             return {
-                nameJars: nameJarsList,
+                errorMessage: message,
             };
         });
+        this.openError();
     }
 
     /**
-     * @param {any} e event
-     * go back to request
+     * Set the version of the jar.
+     * @param event text field change event.
+     * @param i     index of the jar file.
      */
-    setName(e) {
-        const nameValue = e.target.value;
-        const nameJarsList = this.state.nameJars.map((jar, i) => {
-            const jarFile = {
-                index: i,
-                name: nameValue,
-                version: jar.version,
-            };
-            return (jarFile);
-        });
-        this.setState(() => {
-            return {
-                nameJars: nameJarsList,
-            };
-        });
+    setVersion(event, i) {
+        const version = event.target.value;
+        this.state.nameMissingJars[i].version = version;
     }
 
+    /**
+     * Set the name of the jar.
+     * @param event text field change event.
+     * @param i     index of the jar file.
+     */
+    setName(event, i) {
+        const nameValue = event.target.value;
+        this.state.nameMissingJars[i].name = nameValue;
+    }
 
     /**
-     * handle open
-     * @param {any} e event
+     * Handle open save data confirmation message.
+     * @param e     button click event.
      */
-    handleOpen(e) {
+    handleOpenSaveData(e) {
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         this.setState(() => {
             return {
-                open: true,
+                openSaveData: true,
             };
         });
     }
 
+
     /**
-     * handle close
+     * Handle the save data confirmation dialog close.
      */
-    handleClose() {
+    handleCloseSaveData() {
         this.setState(() => {
             return {
-                open: false,
+                openSaveData: false,
             };
         });
     }
 
     /**
-     * handle open error message
+     * handle open error message.
      */
-    handleOpenError() {
+    openError() {
         this.setState(() => {
             return {
                 openError: true,
@@ -219,9 +198,9 @@ class ManageJars extends Component {
     }
 
     /**
-     * handle close
+     * Handle error message close.
      */
-    handleCloseError() {
+    closeError() {
         this.setState(() => {
             return {
                 openError: false,
@@ -230,60 +209,46 @@ class ManageJars extends Component {
     }
 
     /**
-     * handle Next
+     * Redirect to the next page based on the response.
      */
-    handleNext() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo += 1;
-        this.setState(() => {
-            return {
-                stepIndex: stepIndexNo,
-            };
+    redirectToNext() {
+        this.props.router.push({
+            pathname: '/app/licenseAdder',
+            state: {
+                packName: this.state.packName,
+                nameMissingJars: this.state.nameMissingJars,
+            }
         });
+
     }
 
     /**
-     * handle Prev
+     * Handle Previous
      */
     handlePrev() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo -= 1;
-        if (stepIndexNo > 0) {
-            this.setState(() => {
-                return {
-                    stepIndex: stepIndexNo,
-                };
-            });
-        }
+        this.backToMain();
     }
 
     /**
-     * reload page
+     * Reload page.
      */
     reloadPage() {
         window.location.reload();
     }
 
     /**
-     * reload page
+     * Redirect to the main page.
      */
     backToMain() {
         hashHistory.push('/');
     }
 
-
-    /**
-     * @class Managejars
-     * @extends {Component}
-     * @description Sample React component
-     */
     render() {
-        /* eslint-disable */
         const actions = [
             <FlatButton
                 label="No"
                 primary={true}
-                onClick={this.handleClose}
+                onClick={this.handleCloseSaveData}
             />,
             <FlatButton
                 label="Yes"
@@ -302,24 +267,30 @@ class ManageJars extends Component {
         ];
         const table = [];
         let k = 0;
-
         if (this.state.nameMissingJars.length > 0) {
+            let i;
             const jars = this.state.nameMissingJars;
             for (i = 0; i < jars.length; i++) {
+                let index = i;
+                let name = this.state.nameMissingJars[i].name.toString();
                 table.push(
                     <TableRow key={i}>
-                        <TableRowColumn key={k}>{jars[i].name}</TableRowColumn>
-                        <TableRowColumn key={k + 1}>
+                        <TableRowColumn style={{fontSize: '14px', width: '45%'}}
+                                        key={k}>{name}</TableRowColumn>
+                        <TableRowColumn style={{width: '35%'}} key={k + 1}>
                             <TextField
-                                name={jars[i].name.toString()}
-                                onChange={this.setName}
-                                hintText='Enter name'
+                                style={{fontSize: '14px'}}
+                                defaultValue={this.state.nameMissingJars[i].name.toString()}
+                                onChange={(event) => this.setName(event, index)}
+                                underlineStyle={{borderColor: '#00bcd461'}}
                             />
                         </TableRowColumn>
-                        <TableRowColumn key={k + 2}>
+                        <TableRowColumn style={{width: '20%'}} key={k + 2}>
                             <TextField
-                                onChange={this.setVersion}
-                                hintText='Enter version'
+                                style={{fontSize: '14px'}}
+                                defaultValue='1.0.0'
+                                onChange={(event) => this.setVersion(event, index)}
+                                underlineStyle={{borderColor: '#00bcd461'}}
                             />
                         </TableRowColumn>
                     </TableRow>
@@ -329,33 +300,32 @@ class ManageJars extends Component {
         }
 
         return (
-            <div className="container-fluid">
-                <h2 className="text-center">{this.state.header}</h2>
-                <br/>
-                <Stepper activeStep={this.state.stepIndex}>
-                    <Step>
-                        <StepLabel>Upload Pack</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Check JAR Names</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Check Missing License</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Download License</StepLabel>
-                    </Step>
-                </Stepper>
-                <form onSubmit={this.handleOpen} style={{display: this.state.displayForm}}>
-                    <Table>
+            <div className="container" style={{overflow:'auto'}}>
+                <HeaderComponent header={this.state.header}/>
+                <StepComponent
+                    step={this.state.stepIndex}
+                />
+
+                {/*The table to enter the name and the version of name missing jars.*/}
+                <form onSubmit={this.handleOpenSaveData} style={{display: this.state.displayForm}}>
+                    <Table style={{overflow: 'auto'}}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow key={0}>
-                                <TableHeaderColumn>JAR</TableHeaderColumn>
-                                <TableHeaderColumn>Input Name</TableHeaderColumn>
-                                <TableHeaderColumn>Input Version</TableHeaderColumn>
+                                <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '45%'}}>JAR File
+                                    Name</TableHeaderColumn>
+                                <TableHeaderColumn
+                                    style={{fontSize: '20px', color: "#000000", width: '35%'}}>Name</TableHeaderColumn>
+                                <TableHeaderColumn style={{
+                                    fontSize: '20px',
+                                    color: "#000000",
+                                    width: '20%'
+                                }}>Version</TableHeaderColumn>
                             </TableRow>
                         </TableHeader>
-                        <TableBody displayRowCheckbox={false}>
+                        <TableBody
+                            displayRowCheckbox={false}
+                            showRowHover={true}
+                        >
                             {table}
                         </TableBody>
                     </Table>
@@ -366,48 +336,42 @@ class ManageJars extends Component {
                             label="Cancel"
                             onClick={this.reloadPage}
                             style={styles.saveButtonStyle}
-                            labelColor='#ffffff'
-                            backgroundColor='#BDBDBD'
                         />
                         <RaisedButton
                             type="submit"
                             label="Save"
                             style={styles.saveButtonStyle}
-                            labelColor='#ffffff'
-                            backgroundColor='#2196F3'
+                            primary={true}
                             disabled={this.state.buttonState}
                         />
                     </div>
                 </form>
-                <div className="container-fluid" style={{display: this.state.displayProgress}}>
-                    <br/><br/><br/>
-                    <div className="row">
-                        <div className="col-lg-5"/>
-                        <div className="col-lg-4">
-                            <CircularProgress color="#f47c24" size={100} thickness={7}/>
-                        </div>
-                        <div className="col-lg-3"/>
-                    </div>
+
+                {/*Display the progress and the status.*/}
+                <div style={{display: this.state.displayProgress}}>
+                    <Paper style={styles.statusNote}>
+                        <strong>Please Wait</strong><br/>
+                        <p>{this.state.statusMessage}</p>
+                    </Paper>
+                    <ProgressComponent/>
                 </div>
+
                 <Dialog
                     title="Error"
                     actions={actionsError}
                     modal={false}
                     open={this.state.openError}
-                    onRequestClose={this.goBackToRequest}
                 >
                     {this.state.errorMessage}
                 </Dialog>
-
 
                 <Dialog
                     title="Confirm"
                     actions={actions}
                     modal={false}
-                    open={this.state.open}
-                    onRequestClose={this.handleClose}
+                    open={this.state.openSaveData}
                 >
-                    Are you sure to save this data ?
+                    Are you sure you want to save this data ?
                 </Dialog>
             </div>
 
@@ -415,4 +379,5 @@ class ManageJars extends Component {
     }
 }
 
+ManageJars = withRouter(ManageJars);
 export default ManageJars;

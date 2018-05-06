@@ -5,31 +5,24 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
+import {ListItem, Paper, RadioButton, RadioButtonGroup, Subheader} from "material-ui";
+import HeaderComponent from "../components/HeaderComponent";
 
 /**
- * @class WaitingRequests
+ * @class ManagePacks
  * @extends {Component}
- * @description Get user details
+ * @description Lists the available packs and allows user to select one for license generation.
  */
 class ManagePacks extends React.Component {
-    /**
-     * @class ManagePacks
-     * @extends {Component}
-     * @param {any} props props for constructor
-     * @description Sample React component
-     */
+
     constructor(props) {
         super(props);
         this.state = {
             listOfPacks: [],
-            selectedPack: 'none',
+            selectedPack: '',
             openError: false,
-            errorMessage: "",
-            errorIcon: '',
-            displayProgress: 'block',
-            displayBox: 'block',
+            errorMessage: '',
             displayForm: 'none',
-            displayLoader: 'none',
             displayErrorBox: 'none',
             buttonState: false,
         };
@@ -39,9 +32,6 @@ class ManagePacks extends React.Component {
         this.handleCloseError = this.handleCloseError.bind(this);
     }
 
-    /**
-     * componentWillMount
-     */
     componentWillMount() {
         ServiceManager.getUploadedPacks().then((response) => {
             this.setState(() => {
@@ -51,19 +41,27 @@ class ManagePacks extends React.Component {
 
                 };
             });
-        }).catch((error) => {
+        }).catch(() => {
             this.setState(() => {
                 return {
-                    errorMessage: 'Server Error',
+                    errorMessage: 'Network Error',
                 };
             });
             this.handleOpenError();
-            // throw new Error(error);
+            // this.setState(() => {
+            //     return {
+            //         listOfPacks: [{"name": "wso2test-1.1.1.zip"}, {"name": "wso2test-1.0.3.zip"}, {"name": "wso2test-1.1.0.zip"}, {"name": "wso2is-analytics-5.4.0.zip"}, {"name": "wso2test-1.2.1.zip"}, {"name": "wso2ei-6.1.1.zip"}, {"name": "wso2test-1.0.1.zip"}]
+            //         ,
+            //         displayForm: 'block',
+            //
+            //     };
+            // });
+
         });
     }
 
     /**
-     * handle open error message
+     * Handle open error message.
      */
     handleOpenError() {
         this.setState(() => {
@@ -74,7 +72,7 @@ class ManagePacks extends React.Component {
     }
 
     /**
-     * handle open error message
+     * Handle close error message.
      */
     handleCloseError() {
         this.setState(() => {
@@ -84,12 +82,16 @@ class ManagePacks extends React.Component {
         });
     }
 
+    /**
+     * Redirects to the main page.
+     */
     backToMain() {
         hashHistory.push('/');
     }
 
     /**
-     * handle the pack selection
+     * Handle the pack selection.
+     * @param e     pack select event.
      */
     selectPack(e) {
         this.setState({
@@ -99,17 +101,12 @@ class ManagePacks extends React.Component {
     }
 
     /**
-     * reload page
+     * Reload page
      */
     reloadPage() {
         window.location.reload();
     }
 
-    /**
-     * @class WaitingRequests
-     * @extends {Component}
-     * @description Sample React component
-     */
     render() {
         const actionsError = [
             <Link to={'/app/'}>
@@ -123,39 +120,29 @@ class ManagePacks extends React.Component {
 
         const packs = this.state.listOfPacks;
         const listOfPackNames = packs.map((pack) =>
-            <div className="radio">
-                <label>
-                    <input type="radio" value={pack.name}
-                           checked={this.state.selectedPack === pack.name}
-                           onChange={this.selectPack}
-                    />
-                    {pack.name}
-                </label>
-            </div>);
+            <RadioButton
+                value={pack.name}
+                label={pack.name}
+            />
+        );
         const path = this.state.buttonState ? '/app/manageJars' : '/app/managePacks';
         return (
 
-            <div className="container-fluid col-md-10">
-
-                <h2>Select a Pack to Generate Licence</h2>
-                <br/>
-                <div className="col-md-8" style={{
-                    float: 'left',
-                    backgroundColor: '#f8cdc1',
-                    padding: '20px',
-                    color: '#d62c1a',
-                    marginBottom: '15px'
-                }}>
-                    <strong>Note: </strong> Please upload your pack to the given location.
+            <div className="container col-md-8">
+                <HeaderComponent header="Select a Pack to Generate Licence"/>
+                <div >
+                    <Paper style={styles.initialNote}>
+                        <strong>Note: </strong> Please upload your pack to the given location.
+                    </Paper>
 
                 </div>
 
-                <div className="col-md-8" style={{display: this.state.displayBox}}>
-
-
+                <div style={{padding:'5%'}}>
                     <form style={{display: this.state.displayForm}}>
-                        {listOfPackNames}
+                        <RadioButtonGroup onChange={this.selectPack} value={this.state.selectedPack}>
+                            {listOfPackNames}
 
+                        </RadioButtonGroup>
                         <Link
                             to={{
                                 pathname: path,
@@ -165,14 +152,13 @@ class ManagePacks extends React.Component {
                             <RaisedButton
                                 type="submit"
                                 label="Generate"
+                                primary={true}
                                 style={styles.generateButtonStyle}
-                                labelColor='#ffffff'
-                                backgroundColor='#2196F3'
                                 disabled={!this.state.buttonState}
                             />
                         </Link>
-
                     </form>
+
                     <Dialog
                         title="Error"
                         actions={actionsError}
@@ -184,7 +170,6 @@ class ManagePacks extends React.Component {
                     </Dialog>
 
                 </div>
-
             </div>
         );
     }

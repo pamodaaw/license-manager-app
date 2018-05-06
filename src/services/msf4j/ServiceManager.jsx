@@ -8,10 +8,11 @@ import MainData from '../MainData';
 * @description all package management services
 */
 class ServiceManager extends Component {
+
     /**
-    * getUploadedPacks
-    * @returns {Promise} promise
-    */
+     * Call the micro service to obtain the list of packs uploaded to the FTP server.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     getUploadedPacks() {
         const url = MainData.microServiceURL + 'getPacks';
         const requestConfig = { withCredentials: true, timeout: 40000000 };
@@ -22,10 +23,11 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * selectLicense
-    * @returns {Promise} promise
-    */
+     * Call the micro service to obtain the list of licenses available.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     selectLicense() {
         const url = MainData.microServiceURL + 'selectLicense';
         const requestConfig = { withCredentials: true };
@@ -35,10 +37,11 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * getLicense
-    * @returns {Promise} promise
-    */
+     * Call the micro service to generate the license text.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     getLicense() {
         const url = MainData.microServiceURL + 'getLicense';
         const requestConfig = { withCredentials: true, timeout: 40000000 };
@@ -48,10 +51,11 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * downloadLicense
-    * @returns {Promise} promise
-    */
+     * Call the micro service to download the license text.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     dowloadLicense() {
         const url = MainData.microServiceURL + 'downloadLicense';
         const requestConfig = { withCredentials: true, timeout: 30000 };
@@ -63,9 +67,10 @@ class ServiceManager extends Component {
     }
 
     /**
-    * extractJars
-    * @returns {Promise} promise
-    */
+     * Call the micro service to the extract the jars of the selected pack.
+     * @param selectedPack the pack selected for license generation.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     extractJars(selectedPack) {
         const url = MainData.microServiceURL + 'extractJars';
         const requestConfig = {
@@ -77,13 +82,13 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * enterJars
-    * @param {json} data json
-    * @param {string} email email
-    * @returns {Promise} promise
-    */
-    enterJars(data, email) {
+     * Call the micro service to enter the name and version defined set of jars.
+     * @param data  name and version defined jars.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    enterJars(data) {
         const url = MainData.microServiceURL + 'enterJars';
         const requestConfig = {
             withCredentials: true,
@@ -97,10 +102,13 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * addLicense
-    * @returns {Promise} promise
-    */
+     * Call the micro service to enter the licenses for the jars.
+     * @param components    components for which the licenses are added.
+     * @param libraries     libraries for which the licenses are added.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     addLicense(components, libraries) {
         const url = MainData.microServiceURL + 'addLicense';
         const requestConfig = {
@@ -116,10 +124,11 @@ class ServiceManager extends Component {
             throw error
         });
     }
+
     /**
-    * checkprogress
-    * @returns {Promise} promise
-    */
+     * Call the micro service to check the progress of the jar extraction task.
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     checkProgress() {
         const url = MainData.microServiceURL + 'progress';
         const requestConfig = {

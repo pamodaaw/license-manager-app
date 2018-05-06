@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Link, hashHistory} from 'react-router';
+import {Link, hashHistory, withRouter} from 'react-router';
 import {
     Table,
     TableHeader,
@@ -22,62 +22,50 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
+import StepComponent from "../components/StepComponent";
+import ProgressComponent from "../components/ProgressComponent";
+import HeaderComponent from "../components/HeaderComponent";
 
 /**
- * @class NameErrorJarsLicense
+ * @class AddLicense
  * @extends {Component}
- * @description Get user details
+ * @description Add licenses for the jars if missing any
  */
 class AddLicense extends Component {
-    /**
-     * @class NameErrorJarsLicense
-     * @extends {Component}
-     * @param {any} props props for constructor
-     * @description Sample React component
-     */
+
     constructor(props) {
         super(props);
         this.state = {
-            userEmail: this.props.location.state.userEmail,//eslint-disable-line
-            nameJars:this.props.location.state.nameJars,
+            nameDefinedJars: this.props.location.state.nameMissingJars,
+            packName: this.props.location.state.packName,
             openError: false,
-            openSuccess: false,
-            openLicense: false,
             confirmLicense: false,
-            errorIcon: '',
             displayProgress: 'block',
-            displayLoader: 'none',
             displayFormLicense: 'none',
             displayDownload: 'none',
             displayComponentTable: 'none',
             displayLibraryTable: 'none',
-            displayErrorBox: 'none',
             buttonState: false,
-            header: 'Please add Licenses for the jars.',
+            header: 'Add Licenses for the jars',
             licenseMissingComponents: [],
             licenseMissingLibraries: [],
             license: [],
-            stepIndex: 1,
+            stepIndex: 2,
             errorMessage: '',
         };
         this.handleAddLicense = this.handleAddLicense.bind(this);
         this.handleComponentSelect = this.handleComponentSelect.bind(this);
         this.handleLibrarySelect = this.handleLibrarySelect.bind(this);
-        this.handleOpenError = this.handleOpenError.bind(this);
-        this.handleCloseError = this.handleCloseError.bind(this);
-        this.handleOpenConfirm = this.handleOpenConfirm.bind(this);
-        this.handleCloseConfirm = this.handleCloseConfirm.bind(this);
-        this.handleNext = this.handleNext.bind(this);
-        this.handlePrev = this.handlePrev.bind(this);
+        this.openError = this.openError.bind(this);
+        this.closeError = this.closeError.bind(this);
+        this.openConfirmation = this.openConfirmation.bind(this);
+        this.closeConfirmation = this.closeConfirmation.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
         this.backToMain = this.backToMain.bind(this);
+        this.redirectToNext = this.redirectToNext.bind(this);
+        this.handleError = this.handleError.bind(this);
     }
 
-    /**
-     * @class NameErrorJarsLicense
-     * @extends {Component}
-     * @description componentWillMount
-     */
     componentWillMount() {
         ServiceManager.selectLicense().then((response) => {
             if (response.data.responseType === "Done") {
@@ -89,60 +77,43 @@ class AddLicense extends Component {
                     });
                 }
             } else {
-                this.setState(() => {
-                    return {
-                        errorMessage: response.data.responseMessage,
-                    };
-                });
-                this.handleOpenError();
+                this.handleError(response.data.responseMessage);
             }
-        }).catch((error) => {
-            throw new Error(error);
+        }).catch(() => {
+            this.handleError("Network Error");
         });
-        ServiceManager.enterJars(this.state.nameJars, this.state.userEmail).then((responseNxt) => {
-            if (responseNxt.data.responseType === 'Done') {
-                if (responseNxt.data.component.length === 0 && responseNxt.data.library.length === 0) {
-                    this.setState(() => {
-                        return {
-                            displayDownload: 'block',
-                            displayFormLicense: 'none',
-                            displayLoader: 'none',
-                            displayProgress: 'none',
-                            header: 'Download License Here',
-                            licenseMissingComponents: responseNxt.data.component,
-                            licenseMissingLibraries: responseNxt.data.library,
-                            stepIndex: 3,
-                        };
-                    });
+        ServiceManager.enterJars(this.state.nameDefinedJars).then((response) => {
+            if (response.data.responseType === "Done") {
+                if (response.data.component.length === 0 && response.data.library.length === 0) {
+                    this.redirectToNext();
                 } else {
                     this.setState(() => {
                         return {
                             displayFormLicense: 'block',
-                            displayLoader: 'none',
                             displayProgress: 'none',
-                            header: 'Select License for these JARs',
-                            licenseMissingComponents: responseNxt.data.component,
-                            licenseMissingLibraries: responseNxt.data.library,
+                            header: 'Add Licenses for the jars',
+                            licenseMissingComponents: response.data.component,
+                            licenseMissingLibraries: response.data.library,
                             stepIndex: 2,
                         };
                     });
                 }
             } else {
-                this.handleOpenError();
-                this.setState(() => {
-                    return {
-                        displayFormLicense: 'none',
-                        displayProgress: 'none',
-                        displayLoader: 'none',
-                        header: 'Unknown Error occured.',
-                    };
-                });
+                this.handleError(response.data.responseMessage);
             }
-        }).catch((error) => {
-            throw new Error(error);
+        }).catch(() => {
+            this.handleError("Network Error");
         });
     }
 
+    handleError(message){
+        this.setState(() => {
+            return {
+                errorMessage: message,
+            };
+        });
+        this.openError();
+    }
 
     handleAddLicense(e) {
         e.preventDefault();
@@ -155,27 +126,21 @@ class AddLicense extends Component {
                 confirmLicense: false,
             };
         });
-        ServiceManager.addLicense(this.state.licenseMissingComponents, this.state.licenseMissingLibraries).then((responseNxt) => {
-            if (responseNxt.data.responseType === 'Done') {
-                this.setState(() => {
-                    return {
-                        displayDownload: 'block',
-                        displayFormLicense: 'none',
-                        displayLoader: 'none',
-                        displayProgress: 'none',
-                        header: 'Download License Here',
-                        stepIndex: 3,
-                    };
-                });
+        ServiceManager.addLicense(this.state.licenseMissingComponents, this.state.licenseMissingLibraries).then((response) => {
+            if (response.data.responseType === 'Done') {
+                this.redirectToNext();
             } else {
-                console.log("error while adding license license");
+                this.handleError(response.data.responseMessage)
             }
-        }).catch((error) => {
-            throw new Error(error);
+        }).catch(() => {
+            this.handleError("Network Error");
         });
     }
 
-    handleOpenConfirm() {
+    openConfirmation(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
         this.setState(() => {
             return {
                 confirmLicense: true,
@@ -183,7 +148,7 @@ class AddLicense extends Component {
         });
     }
 
-    handleCloseConfirm() {
+    closeConfirmation() {
         this.setState(() => {
             return {
                 confirmLicense: false,
@@ -192,9 +157,9 @@ class AddLicense extends Component {
     }
 
     /**
-     * handle open error message
+     * Handle open error message
      */
-    handleOpenError() {
+    openError() {
         this.setState(() => {
             return {
                 openError: true,
@@ -203,9 +168,9 @@ class AddLicense extends Component {
     }
 
     /**
-     * handle close
+     * Handle close error message
      */
-    handleCloseError() {
+    closeError() {
         this.setState(() => {
             return {
                 openError: false,
@@ -214,49 +179,33 @@ class AddLicense extends Component {
     }
 
     /**
-     * handle Next
+     * Redirect to the next page based on the response.
      */
-    handleNext() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo += 1;
-        this.setState(() => {
-            return {
-                stepIndex: stepIndexNo,
-            };
+    redirectToNext() {
+        hashHistory.push({
+            pathname: '/app/licenseGenerator',
+            state: {
+                packName: this.state.packName,
+            }
         });
     }
 
     /**
-     * handle Prev
-     */
-    handlePrev() {
-        let stepIndexNo = this.state.stepIndex;
-        stepIndexNo -= 1;
-        if (stepIndexNo > 0) {
-            this.setState(() => {
-                return {
-                    stepIndex:stepIndexNo,
-                };
-            });
-        }
-    }
-
-    /**
-     * reload page
+     * Reload the page.
      */
     reloadPage() {
         window.location.reload();
     }
 
     /**
-     * reload page
+     * Redirect to the main page.
      */
     backToMain() {
         hashHistory.push('/');
     }
 
     /**
-     * handleComponentSelect
+     * Handle the event when licenses are selected for a component.
      * @param {any} event event
      * @param {any} j event
      * @param {any} n event
@@ -285,7 +234,7 @@ class AddLicense extends Component {
     }
 
     /**
-     * handleLibrarySelect
+     * Handle the event when licenses are selected for a library.
      * @param {any} event event
      * @param {any} j event
      * @param {any} n event
@@ -313,11 +262,6 @@ class AddLicense extends Component {
         });
     }
 
-    /**
-     * @class WaitingRequests
-     * @extends {Component}
-     * @description Sample React component
-     */
     render() {
         const licenseConfirmActions = [
             <FlatButton
@@ -328,7 +272,7 @@ class AddLicense extends Component {
             <FlatButton
                 label="Recheck"
                 primary={true}
-                onClick={this.handleCloseConfirm}
+                onClick={this.closeConfirmation}
             />
         ];
         const actionsError = [
@@ -358,7 +302,6 @@ class AddLicense extends Component {
             );
         }
         if (this.state.licenseMissingComponents.length > 0) {
-            /* eslint-disable */
             let i = 0;
             const jars = this.state.licenseMissingComponents;
             let index = -1;
@@ -366,15 +309,21 @@ class AddLicense extends Component {
                 index = index + 1;
                 component.push(
                     <TableRow key={i}>
-                        <TableRowColumn key={k}>{jars[i].name}</TableRowColumn>
-                        <TableRowColumn key={k + 1}>{jars[i].version}</TableRowColumn>
-                        <TableRowColumn key={k + 2}>{jars[i].type}</TableRowColumn>
-                        <TableRowColumn key={k + 3}>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '45%'}}
+                                        key={k}>{jars[i].name}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '20%'}}
+                                        key={k + 1}>{jars[i].version}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '15%'}}
+                                        key={k + 2}>{jars[i].type}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 3}>
                             <SelectField
+                                style={styles.selectField}
+                                autoWidth={true}
                                 value={this.state.licenseMissingComponents[i].licenseId}
                                 onChange={this.handleComponentSelect.bind(this, i)}
                                 maxHeight={200}
-                                floatingLabelText="Select license"
+                                underlineStyle={{borderColor : '#00bcd461'}}
+
                             >
                                 {license}
                             </SelectField>
@@ -384,26 +333,28 @@ class AddLicense extends Component {
                 k = k + 3;
             }
             displayComponent = 'block';
-            /* eslint-enable */
         } else {
             displayComponent = 'none';
         }
         if (this.state.licenseMissingLibraries.length > 0) {
-            /* eslint-disable */
-            let i = 0;
+            let i;
             const jars = this.state.licenseMissingLibraries;
             for (i = 0; i < jars.length; i++) {
                 library.push(
                     <TableRow key={i}>
-                        <TableRowColumn key={k}>{jars[i].name}</TableRowColumn>
-                        <TableRowColumn key={k + 1}>{jars[i].version}</TableRowColumn>
-                        <TableRowColumn key={k + 2}>{jars[i].type}</TableRowColumn>
-                        <TableRowColumn key={k + 3}>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '45%'}}
+                                        key={k}>{jars[i].name}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '20%'}}
+                                        key={k + 1}>{jars[i].version}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '15%'}}
+                                        key={k + 2}>{jars[i].type}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 3}>
                             <SelectField
+                                style={styles.selectField}
                                 value={this.state.licenseMissingLibraries[i].licenseId}
                                 onChange={this.handleLibrarySelect.bind(this, i)}
                                 maxHeight={200}
-                                floatingLabelText="Select license"
+                                underlineStyle={{borderColor : '#00bcd461'}}
                             >
                                 {license}
                             </SelectField>
@@ -413,44 +364,43 @@ class AddLicense extends Component {
                 k = k + 3;
             }
             displayLibrary = 'block';
-            /* eslint-enable */
         } else {
             displayLibrary = 'none';
         }
         return (
-            <div className="container-fluid">
-                <h2 className="text-center">{this.state.header}</h2>
-                <br/>
-                <Stepper activeStep={this.state.stepIndex}>
-                    <Step>
-                        <StepLabel>Upload Pack</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Check JAR Names</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Check Missing License</StepLabel>
-                    </Step>
-                    <Step>
-                        <StepLabel>Download License</StepLabel>
-                    </Step>
-                </Stepper>
-                {/* eslint-disable max-len */}
-                <form onSubmit={this.handleOpenConfirm} style={{display: this.state.displayFormLicense}}>
+            <div className="container">
+                <HeaderComponent header={this.state.header}/>
+                <StepComponent
+                    step={this.state.stepIndex}
+                />
+                <form onSubmit={this.openConfirmation} style={{display: this.state.displayFormLicense}}>
                     <div style={{display: displayComponent}}>
                         <Subheader style={styles.subHeader}>Components</Subheader>
-                        <Table>
+                        <Table style={{overflow: 'auto'}}>>
                             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                 <TableRow key={0}>
-                                    <TableHeaderColumn>Name</TableHeaderColumn>
-                                    <TableHeaderColumn>Version</TableHeaderColumn>
-                                    <TableHeaderColumn>File Name</TableHeaderColumn>
-                                    <TableHeaderColumn>Select License</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '45%'
+                                    }}>Name</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '20%'
+                                    }}>Version</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '15%'
+                                    }}>Type</TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
+                                        License</TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody displayRowCheckbox={false} ref={(c) => {
-                                this.com = c;
-                            }}>
+                            <TableBody displayRowCheckbox={false}
+                                       showRowHover={true}
+                            >
                                 {component}
                             </TableBody>
                         </Table>
@@ -458,16 +408,31 @@ class AddLicense extends Component {
                     <br/>
                     <div style={{display: displayLibrary}}>
                         <Subheader style={styles.subHeader}>Libraries</Subheader>
-                        <Table>
+                        <Table style={{overflow: 'auto'}}>
                             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                 <TableRow key={0}>
-                                    <TableHeaderColumn>Name</TableHeaderColumn>
-                                    <TableHeaderColumn>Version</TableHeaderColumn>
-                                    <TableHeaderColumn>File Name</TableHeaderColumn>
-                                    <TableHeaderColumn>Select License</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '45%'
+                                    }}>Name</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '20%'
+                                    }}>Version</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '15%'
+                                    }}>Type</TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
+                                        License</TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody displayRowCheckbox={false}>
+                            <TableBody displayRowCheckbox={false}
+                                       showRowHover={true}
+                            >
                                 {library}
                             </TableBody>
                         </Table>
@@ -477,50 +442,22 @@ class AddLicense extends Component {
                         type="submit"
                         label="Accept and Save"
                         style={styles.saveButtonStyle}
-                        labelColor='#ffffff'
-                        backgroundColor='#2196F3'
+                        primary={true}
                         disabled={this.state.buttonState}
                     />
                 </form>
 
-                <div className="container-fluid" style={{display: this.state.displayLoader}}>
-                    <br/><br/><br/>
-                    <div className="row">
-                        <div className="col-lg-5"/>
-                        <div className="col-lg-4">
-                            <CircularProgress color="#f47c24" size={100} thickness={7}/>
-                            <div className="12" style={{
-                                float: 'left',
-                                padding: '20px',
-                                color: '#d62c1a',
-                                marginBottom: '15px'
-                            }}>
-                                <strong>Status: </strong>{this.state.statusMessage}
-
-                            </div>
-                        </div>
-                        <div className="col-lg-3"/>
-                    </div>
-                </div>
                 <Dialog
                     title="Error"
                     actions={actionsError}
                     modal={false}
                     open={this.state.openError}
-                    onRequestClose={this.goBackToRequest}
                 >
                     {this.state.errorMessage}
                 </Dialog>
 
                 <div className="container-fluid" style={{display: this.state.displayProgress}}>
-                    <br/><br/><br/>
-                    <div className="row">
-                        <div className="col-lg-5"/>
-                        <div className="col-lg-4">
-                            <CircularProgress color="#f47c24" size={100} thickness={7}/>
-                        </div>
-                        <div className="col-lg-3"/>
-                    </div>
+                    <ProgressComponent/>
                 </div>
 
                 <Dialog
@@ -538,4 +475,5 @@ class AddLicense extends Component {
     }
 }
 
+AddLicense = withRouter(AddLicense);
 export default AddLicense;

@@ -1,8 +1,15 @@
 export default {
+
+    // Styles for buttons.
+    initialButtonStyle: {
+        width: '50%',
+        marginLeft: "25%",
+    },
     buttonStyle: {
         width: 200,
         height: 50,
     },
+
     saveButtonStyle: {
         width: 200,
         height: 50,
@@ -14,6 +21,34 @@ export default {
         height: 40,
         float: 'left',
         marginRight: 5,
+    },
+    // Styles for notes.
+    initialNote:{
+        align:'center',
+        backgroundColor: '#f8cdc1',
+        padding: '20px',
+        color: '#d62c1a',
+        marginBottom: '15px'
+    },
+
+    welcomeNote:{
+        marginTop:'20%',
+        align: "center",
+        height: "100%",
+        width: "100%",
+        paddingBottom: '2%',
+    },
+
+    statusNote:{
+        float: 'center',
+        backgroundColor: '#00bcd461',
+        padding: '20px',
+        color: '#00000',
+        marginBottom: '15px'
+    },
+
+    selectField:{
+        fontSize: '14px',  width: '100%'
     },
     style: {
         paper: {
@@ -91,10 +126,6 @@ export default {
     },
     list: {
         backgroundColor: '#333333',
-    },
-    selectField: {
-        width: '100%',
-        fontFamily: 'Helvetica',
     },
 };
 
