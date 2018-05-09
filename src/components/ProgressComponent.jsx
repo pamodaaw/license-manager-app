@@ -20,9 +20,6 @@ import React, {Component} from 'react';
 import {CircularProgress} from "material-ui";
 
 export default class ProgressComponent extends Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (
