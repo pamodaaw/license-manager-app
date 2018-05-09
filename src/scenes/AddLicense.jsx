@@ -37,6 +37,7 @@ import styles from '../styles';
 import StepComponent from "../components/StepComponent";
 import ProgressComponent from "../components/ProgressComponent";
 import HeaderComponent from "../components/HeaderComponent";
+import {Checkbox} from "material-ui";
 
 /**
  * @class AddLicense
@@ -57,7 +58,7 @@ class AddLicense extends Component {
             displayDownload: 'none',
             displayComponentTable: 'none',
             displayLibraryTable: 'none',
-            buttonState: false,
+            checked: false,
             header: 'Add Licenses for the jars',
             licenseMissingComponents: [],
             licenseMissingLibraries: [],
@@ -72,10 +73,9 @@ class AddLicense extends Component {
         this.closeError = this.closeError.bind(this);
         this.openConfirmation = this.openConfirmation.bind(this);
         this.closeConfirmation = this.closeConfirmation.bind(this);
-        this.reloadPage = this.reloadPage.bind(this);
-        this.backToMain = this.backToMain.bind(this);
         this.redirectToNext = this.redirectToNext.bind(this);
         this.handleError = this.handleError.bind(this);
+        this.updateCheck = this.updateCheck.bind(this);
     }
 
     componentWillMount() {
@@ -118,7 +118,7 @@ class AddLicense extends Component {
         });
     }
 
-    handleError(message){
+    handleError(message) {
         this.setState(() => {
             return {
                 errorMessage: message,
@@ -203,17 +203,14 @@ class AddLicense extends Component {
     }
 
     /**
-     * Reload the page.
+     * Handle the check box click event.
      */
-    reloadPage() {
-        window.location.reload();
-    }
-
-    /**
-     * Redirect to the main page.
-     */
-    backToMain() {
-        hashHistory.push('/');
+    updateCheck() {
+        this.setState((oldState) => {
+            return {
+                checked: !oldState.checked
+            };
+        });
     }
 
     /**
@@ -233,7 +230,8 @@ class AddLicense extends Component {
                     name: jar.name,
                     version: jar.version,
                     type: jar.type,
-                    licenseId: m,
+                    previousLicense: jar.previousLicense,
+                    licenseKey: m,
                 };
                 return (jarFile);
             }
@@ -262,7 +260,8 @@ class AddLicense extends Component {
                     name: jar.name,
                     version: jar.version,
                     type: jar.type,
-                    licenseId: m,
+                    previousLicense: jar.previousLicense,
+                    licenseKey: m,
                 };
                 return (jarFile);
             }
@@ -307,7 +306,7 @@ class AddLicense extends Component {
         for (let i = 0; i < licenseList.length; i++) {
             license.push(
                 <MenuItem
-                    value={licenseList[i].LICENSE_ID}
+                    value={licenseList[i].LICENSE_KEY}
                     key={licenseList[i].LICENSE_ID}
                     primaryText={licenseList[i].LICENSE_KEY}
                 />
@@ -316,26 +315,34 @@ class AddLicense extends Component {
         if (this.state.licenseMissingComponents.length > 0) {
             let i = 0;
             const jars = this.state.licenseMissingComponents;
-            let index = -1;
             for (i = 0; i < jars.length; i++) {
-                index = index + 1;
+                let previousLicenseTextColor = {color: '#000000'};
+                let licenseTextColor;
+                if (jars[i].previousLicense !== 'apache2') {
+                    previousLicenseTextColor = {color: '#008080'}
+                }
+                if (jars[i].licenseKey !== 'apache2') {
+                    licenseTextColor = {color: '#008080'}
+                }
                 component.push(
-                    <TableRow key={i}>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '45%'}}
+                    <TableRow style={previousLicenseTextColor} key={i}>
+                        <TableRowColumn style={{fontSize: '14px', width: '35%'}}
                                         key={k}>{jars[i].name}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '20%'}}
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
                                         key={k + 1}>{jars[i].version}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '15%'}}
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
                                         key={k + 2}>{jars[i].type}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 3}>
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
+                                        key={k + 3}>{jars[i].previousLicense}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 4}>
                             <SelectField
                                 style={styles.selectField}
+                                labelStyle={licenseTextColor}
                                 autoWidth={true}
-                                value={this.state.licenseMissingComponents[i].licenseId}
+                                value={this.state.licenseMissingComponents[i].licenseKey}
                                 onChange={this.handleComponentSelect.bind(this, i)}
                                 maxHeight={200}
-                                underlineStyle={{borderColor : '#00bcd461'}}
-
+                                underlineStyle={{borderColor: '#00bcd461'}}
                             >
                                 {license}
                             </SelectField>
@@ -352,28 +359,41 @@ class AddLicense extends Component {
             let i;
             const jars = this.state.licenseMissingLibraries;
             for (i = 0; i < jars.length; i++) {
+                let previousLicenseTextColor = {color: '#000000'};
+                let licenseTextColor;
+                if (jars[i].previousLicense !== 'apache2') {
+                    previousLicenseTextColor = {color: '#008080'}
+                }
+                if (jars[i].licenseKey !== 'apache2') {
+                    licenseTextColor = {color: '#008080'}
+                }
+
                 library.push(
-                    <TableRow key={i}>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '45%'}}
+                    <TableRow style={previousLicenseTextColor} key={i}>
+                        <TableRowColumn style={{fontSize: '14px', width: '35%'}}
                                         key={k}>{jars[i].name}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '20%'}}
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
                                         key={k + 1}>{jars[i].version}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', overflowX: 'auto', width: '15%'}}
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
                                         key={k + 2}>{jars[i].type}</TableRowColumn>
-                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 3}>
+                        <TableRowColumn style={{fontSize: '14px', width: '15%'}}
+                                        key={k + 3}>{jars[i].previousLicense}</TableRowColumn>
+                        <TableRowColumn style={{fontSize: '14px', width: '20%'}} key={k + 4}>
                             <SelectField
                                 style={styles.selectField}
-                                value={this.state.licenseMissingLibraries[i].licenseId}
+                                labelStyle={licenseTextColor}
+                                value={this.state.licenseMissingLibraries[i].licenseKey}
                                 onChange={this.handleLibrarySelect.bind(this, i)}
                                 maxHeight={200}
-                                underlineStyle={{borderColor : '#00bcd461'}}
+                                underlineStyle={{borderColor: '#00bcd461'}}
+                                selectedMenuItemStyle={{color: '#2874A6'}}
                             >
                                 {license}
                             </SelectField>
                         </TableRowColumn>
                     </TableRow>
                 );
-                k = k + 3;
+                k = k + 4;
             }
             displayLibrary = 'block';
         } else {
@@ -394,18 +414,23 @@ class AddLicense extends Component {
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
-                                        width: '45%'
+                                        width: '35%'
                                     }}>Name</TableHeaderColumn>
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
-                                        width: '20%'
+                                        width: '15%'
                                     }}>Version</TableHeaderColumn>
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
                                         width: '15%'
                                     }}>Type</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '15%'
+                                    }}>License</TableHeaderColumn>
                                     <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
                                         License</TableHeaderColumn>
                                 </TableRow>
@@ -426,18 +451,23 @@ class AddLicense extends Component {
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
-                                        width: '45%'
+                                        width: '35%'
                                     }}>Name</TableHeaderColumn>
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
-                                        width: '20%'
+                                        width: '15%'
                                     }}>Version</TableHeaderColumn>
                                     <TableHeaderColumn style={{
                                         fontSize: '20px',
                                         color: "#000000",
                                         width: '15%'
                                     }}>Type</TableHeaderColumn>
+                                    <TableHeaderColumn style={{
+                                        fontSize: '20px',
+                                        color: "#000000",
+                                        width: '15%'
+                                    }}>License</TableHeaderColumn>
                                     <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
                                         License</TableHeaderColumn>
                                 </TableRow>
@@ -450,12 +480,17 @@ class AddLicense extends Component {
                         </Table>
                     </div>
                     <br/>
+                    <Checkbox
+                        label='I guarantee that all the licenses added are correct.'
+                        checked={this.state.checked}
+                        onCheck={this.updateCheck.bind(this)}
+                    />
                     <RaisedButton
                         type="submit"
                         label="Accept and Save"
                         style={styles.saveButtonStyle}
                         primary={true}
-                        disabled={this.state.buttonState}
+                        disabled={!this.state.checked}
                     />
                 </form>
 
