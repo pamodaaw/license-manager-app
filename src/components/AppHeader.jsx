@@ -17,13 +17,8 @@
  */
 
 import React, {Component} from 'react';
-import Person from 'material-ui/svg-icons/social/person';
-import IconButton from 'material-ui/IconButton';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
 import ValidateUser from '../services/authentication/ValidateUser';
 import logo from '../assets/images/logo-inverse.svg';
-import styles from "../styles";
 import {Link} from "react-router";
 
 /**

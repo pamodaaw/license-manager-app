@@ -65,6 +65,8 @@ class AddLicense extends Component {
             license: [],
             stepIndex: 2,
             errorMessage: '',
+            isDataValid: false,
+            recheckDialog: false
         };
         this.handleAddLicense = this.handleAddLicense.bind(this);
         this.handleComponentSelect = this.handleComponentSelect.bind(this);
@@ -76,6 +78,7 @@ class AddLicense extends Component {
         this.redirectToNext = this.redirectToNext.bind(this);
         this.handleError = this.handleError.bind(this);
         this.updateCheck = this.updateCheck.bind(this);
+        this.validateFormData = this.validateFormData.bind(this);
     }
 
     componentWillMount() {
@@ -153,17 +156,30 @@ class AddLicense extends Component {
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        this.setState(() => {
-            return {
-                confirmLicense: true,
-            };
-        });
+        this.validateFormData();
+
+        if (this.state.isDataValid) {
+            this.setState(() => {
+                return {
+                    confirmLicense: true,
+                };
+            });
+        }
+        else {
+            this.setState(() => {
+                return {
+                    recheckDialog: true,
+                };
+            });
+        }
+
     }
 
     closeConfirmation() {
         this.setState(() => {
             return {
                 confirmLicense: false,
+                recheckDialog: false
             };
         });
     }
@@ -211,6 +227,39 @@ class AddLicense extends Component {
                 checked: !oldState.checked
             };
         });
+    }
+
+    validateFormData() {
+        const components = this.state.licenseMissingComponents;
+        const libraries = this.state.licenseMissingLibraries;
+        let areAllComponentsFilled = false;
+        let areAllLibrariesFilled = false;
+        if (components.length > 0) {
+            for (let i = 0; i < components.length; i++) {
+                if (components[i].licenseKey !== "NEW") {
+                    areAllComponentsFilled = true;
+                }
+            }
+        } else {
+            areAllComponentsFilled = true;
+        }
+        if (libraries.length > 0) {
+            for (let i = 0; i < libraries.length; i++) {
+                if (libraries[i].licenseKey !== "NEW") {
+                    areAllLibrariesFilled = true;
+                }
+            }
+        } else {
+            areAllLibrariesFilled = true;
+        }
+
+        if (areAllComponentsFilled && areAllLibrariesFilled) {
+            this.setState(() => {
+                return {
+                    isDataValid: true,
+                };
+            });
+        }
     }
 
     /**
@@ -286,6 +335,13 @@ class AddLicense extends Component {
                 onClick={this.closeConfirmation}
             />
         ];
+        const recheckLicenses = [
+            <FlatButton
+                label="Back"
+                primary={true}
+                onClick={this.closeConfirmation}
+            />
+        ];
         const actionsError = [
             <Link to={'/service/packManager'}>
                 <FlatButton
@@ -313,19 +369,17 @@ class AddLicense extends Component {
             );
         }
         if (this.state.licenseMissingComponents.length > 0) {
-            let i = 0;
             const jars = this.state.licenseMissingComponents;
-            for (i = 0; i < jars.length; i++) {
-                let previousLicenseTextColor = {color: '#000000'};
+            for (let i = 0; i < jars.length; i++) {
                 let licenseTextColor;
-                if (jars[i].previousLicense !== 'apache2') {
-                    previousLicenseTextColor = {color: '#008080'}
-                }
-                if (jars[i].licenseKey !== 'apache2') {
-                    licenseTextColor = {color: '#008080'}
+
+                if (jars[i].previousLicense === 'NEW' && jars[i].licenseKey === 'apache2') {
+                    licenseTextColor = {color: '#000000'}
+                } else if (jars[i].previousLicense !== 'apache2' || jars[i].licenseKey !== 'apache2') {
+                    licenseTextColor = {color: '#1B4F72'}
                 }
                 component.push(
-                    <TableRow style={previousLicenseTextColor} key={i}>
+                    <TableRow style={licenseTextColor} key={i}>
                         <TableRowColumn style={{fontSize: '14px', width: '35%'}}
                                         key={k}>{jars[i].name}</TableRowColumn>
                         <TableRowColumn style={{fontSize: '14px', width: '15%'}}
@@ -343,6 +397,8 @@ class AddLicense extends Component {
                                 onChange={this.handleComponentSelect.bind(this, i)}
                                 maxHeight={200}
                                 underlineStyle={{borderColor: '#00bcd461'}}
+                                selectedMenuItemStyle={{color: '#17A589'}}
+
                             >
                                 {license}
                             </SelectField>
@@ -359,17 +415,16 @@ class AddLicense extends Component {
             let i;
             const jars = this.state.licenseMissingLibraries;
             for (i = 0; i < jars.length; i++) {
-                let previousLicenseTextColor = {color: '#000000'};
                 let licenseTextColor;
-                if (jars[i].previousLicense !== 'apache2') {
-                    previousLicenseTextColor = {color: '#008080'}
-                }
-                if (jars[i].licenseKey !== 'apache2') {
-                    licenseTextColor = {color: '#008080'}
+
+                if (jars[i].previousLicense === 'NEW' && jars[i].licenseKey === 'apache2') {
+                    licenseTextColor = {color: '#000000'}
+                } else if (jars[i].previousLicense !== 'apache2' || jars[i].licenseKey !== 'apache2') {
+                    licenseTextColor = {color: '#1B4F72'}
                 }
 
                 library.push(
-                    <TableRow style={previousLicenseTextColor} key={i}>
+                    <TableRow style={licenseTextColor} key={i}>
                         <TableRowColumn style={{fontSize: '14px', width: '35%'}}
                                         key={k}>{jars[i].name}</TableRowColumn>
                         <TableRowColumn style={{fontSize: '14px', width: '15%'}}
@@ -386,7 +441,7 @@ class AddLicense extends Component {
                                 onChange={this.handleLibrarySelect.bind(this, i)}
                                 maxHeight={200}
                                 underlineStyle={{borderColor: '#00bcd461'}}
-                                selectedMenuItemStyle={{color: '#2874A6'}}
+                                selectedMenuItemStyle={{color: '#17A589'}}
                             >
                                 {license}
                             </SelectField>
@@ -512,9 +567,17 @@ class AddLicense extends Component {
                     actions={licenseConfirmActions}
                     modal={false}
                     open={this.state.confirmLicense}
-                    onRequestClose={this.handleClose}
                 >
                     Make sure you have added the correct licenses.
+                </Dialog>
+
+                <Dialog
+                    title="Alert"
+                    actions={recheckLicenses}
+                    modal={false}
+                    open={this.state.recheckDialog}
+                >
+                    Please add licenses to all jars.
                 </Dialog>
             </div>
 

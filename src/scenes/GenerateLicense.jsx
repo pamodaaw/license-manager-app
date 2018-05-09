@@ -96,8 +96,6 @@ class GenerateLicense extends Component {
         }).catch((error) => {
             throw new Error(error);
         });
-        this.backToMain();
-
     }
 
     /**

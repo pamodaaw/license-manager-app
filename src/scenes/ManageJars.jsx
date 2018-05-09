@@ -232,14 +232,6 @@ class ManageJars extends Component {
         });
 
     }
-
-    /**
-     * Handle Previous
-     */
-    handlePrev() {
-        this.backToMain();
-    }
-
     /**
      * Reload page.
      */
@@ -283,7 +275,7 @@ class ManageJars extends Component {
             const jars = this.state.nameMissingJars;
             for (i = 0; i < jars.length; i++) {
                 let index = i;
-                let name = this.state.nameMissingJars[i].name.toString();
+                let name = this.state.nameMissingJars[i].jarFileName.toString();
                 table.push(
                     <TableRow key={i}>
                         <TableRowColumn style={{fontSize: '14px', width: '45%'}}
@@ -299,7 +291,7 @@ class ManageJars extends Component {
                         <TableRowColumn style={{width: '20%'}} key={k + 2}>
                             <TextField
                                 style={{fontSize: '14px'}}
-                                defaultValue='1.0.0'
+                                defaultValue={this.state.nameMissingJars[i].version.toString()}
                                 onChange={(event) => this.setVersion(event, index)}
                                 underlineStyle={{borderColor: '#00bcd461'}}
                             />
