@@ -17,27 +17,46 @@
  */
 
 import React, { Component } from 'react';
-import { Router, Route, hashHistory} from 'react-router';
+import { Router, Route, browserHistory,hashHistory} from 'react-router';
 import Root from './scenes/Root';
 import ManagePacks from './scenes/ManagePacks';
 import ManageJars from './scenes/ManageJars';
 import AddLicense from './scenes/AddLicense';
 import GenerateLicense from './scenes/GenerateLicense';
 import frontPage from './scenes/InitialPage'
+import IndexRoute from "react-router/es/IndexRoute";
 // import './App.css';
 
 class App extends Component {
   render() {
     return (
+//        <Router >
+  //          <Route path={'/service'} component={Root} history={browserHistory} >
+    //            <IndexRoute component={frontPage} />
+      //          <Route path={'packManager'} component={ManagePacks} />
+        //        <Route path={'jarManager'} component={ManageJars} />
+          //      <Route path={'licenseGenerator'} component={GenerateLicense} />
+//                <Route path={'licenseAdder'} component={AddLicense} />
+//                <Route path={'/'} component={frontPage} />
+//            </Route>
+//        </Router>
         <Router history={hashHistory}>
-            <Route path={'/app'} component={Root} >
-                <Route path={'managePacks'} component={ManagePacks} />
-                <Route path={'manageJars'} component={ManageJars} />
+            <Route path={'/service'} component={Root} >
+                <Route path={'packManager'} component={ManagePacks} />
+                <Route path={'jarManager'} component={ManageJars} />
                 <Route path={'licenseGenerator'} component={GenerateLicense} />
                 <Route path={'licenseAdder'} component={AddLicense} />
                 <Route path={'/'} component={frontPage} />
             </Route>
         </Router>
+
+  //       <Router>
+  //       <Route path="/" component={Main} history={browserHistory}>
+  //         <IndexRoute component={Home} />
+  //     <Route path="/cars" component={Car}/>
+  //     <Route path="/about" component={About}/>
+  // </Route>
+  // </Router>
     );
   }
 }

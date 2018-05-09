@@ -22,6 +22,7 @@
     "react-scripts": "1.1.4"
   },
   "scripts": {
+    "homepage" : "https://identity-gateway.cloud.wso2.com/t/wso2internalstg/licenseManager/#/",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

@@ -138,7 +138,7 @@ class GenerateLicense extends Component {
 
     render() {
         const actionsError = [
-            <Link to={'/app/managePacks'}>
+            <Link to={'/service/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}

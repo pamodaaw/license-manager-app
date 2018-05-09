@@ -26,19 +26,12 @@ import {
     TableBody,
     TableRowColumn,
 } from 'material-ui/Table';
-import {
-    Step,
-    Stepper,
-    StepLabel,
-} from 'material-ui/Stepper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import CircularProgress from 'material-ui/CircularProgress';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
-import * as router from "react-router";
 import {Paper} from "material-ui";
 import StepComponent from "../components/StepComponent";
 import ProgressComponent from "../components/ProgressComponent";
@@ -163,8 +156,8 @@ class ManageJars extends Component {
      * @param i     index of the jar file.
      */
     setVersion(event, i) {
-        const version = event.target.value;
-        this.state.nameMissingJars[i].version = version;
+        const newVersion = event.target.value;
+        this.state.nameMissingJars[i].version = newVersion;
     }
 
     /**
@@ -173,8 +166,8 @@ class ManageJars extends Component {
      * @param i     index of the jar file.
      */
     setName(event, i) {
-        const nameValue = event.target.value;
-        this.state.nameMissingJars[i].name = nameValue;
+        const newName = event.target.value;
+        this.state.nameMissingJars[i].name = newName;
     }
 
     /**
@@ -231,7 +224,7 @@ class ManageJars extends Component {
      */
     redirectToNext() {
         this.props.router.push({
-            pathname: '/app/licenseAdder',
+            pathname: '/service/licenseAdder',
             state: {
                 packName: this.state.packName,
                 nameMissingJars: this.state.nameMissingJars,
@@ -275,7 +268,7 @@ class ManageJars extends Component {
             />,
         ];
         const actionsError = [
-            <Link to={'/app/managePacks'}>
+            <Link to={'/service/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}

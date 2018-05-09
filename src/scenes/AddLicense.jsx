@@ -27,15 +27,9 @@ import {
     TableRowColumn,
 } from 'material-ui/Table';
 import Subheader from 'material-ui/Subheader';
-import {
-    Step,
-    Stepper,
-    StepLabel,
-} from 'material-ui/Stepper';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import CircularProgress from 'material-ui/CircularProgress';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import ServiceManager from '../services/msf4j/ServiceManager';
@@ -201,7 +195,7 @@ class AddLicense extends Component {
      */
     redirectToNext() {
         hashHistory.push({
-            pathname: '/app/licenseGenerator',
+            pathname: '/service/licenseGenerator',
             state: {
                 packName: this.state.packName,
             }
@@ -294,7 +288,7 @@ class AddLicense extends Component {
             />
         ];
         const actionsError = [
-            <Link to={'/app/managePacks'}>
+            <Link to={'/service/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}

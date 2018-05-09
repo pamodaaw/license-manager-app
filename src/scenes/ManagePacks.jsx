@@ -17,13 +17,13 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory} from 'react-router';
+import {Link, hashHistory,browserHistory} from 'react-router';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
-import {ListItem, Paper, RadioButton, RadioButtonGroup, Subheader} from "material-ui";
+import {Paper, RadioButton, RadioButtonGroup} from "material-ui";
 import HeaderComponent from "../components/HeaderComponent";
 
 /**
@@ -31,7 +31,7 @@ import HeaderComponent from "../components/HeaderComponent";
  * @extends {Component}
  * @description Lists the available packs and allows user to select one for license generation.
  */
-class ManagePacks extends React.Component {
+class ManagePacks extends Component {
 
     constructor(props) {
         super(props);
@@ -60,20 +60,20 @@ class ManagePacks extends React.Component {
                 };
             });
         }).catch(() => {
-            this.setState(() => {
-                return {
-                    errorMessage: 'Network Error',
-                };
-            });
-            this.handleOpenError();
             // this.setState(() => {
             //     return {
-            //         listOfPacks: [{"name": "wso2test-1.1.1.zip"}, {"name": "wso2test-1.0.3.zip"}, {"name": "wso2test-1.1.0.zip"}, {"name": "wso2is-analytics-5.4.0.zip"}, {"name": "wso2test-1.2.1.zip"}, {"name": "wso2ei-6.1.1.zip"}, {"name": "wso2test-1.0.1.zip"}]
-            //         ,
-            //         displayForm: 'block',
-            //
+            //         errorMessage: 'Network Error',
             //     };
             // });
+            // this.handleOpenError();
+            this.setState(() => {
+                return {
+                    listOfPacks: [{"name": "wso2test-1.1.1.zip"}, {"name": "wso2test-1.0.3.zip"}, {"name": "wso2test-1.1.0.zip"}, {"name": "wso2is-analytics-5.4.0.zip"}, {"name": "wso2test-1.2.1.zip"}, {"name": "wso2ei-6.1.1.zip"}, {"name": "wso2test-1.0.1.zip"}]
+                    ,
+                    displayForm: 'block',
+
+                };
+            });
 
         });
     }
@@ -127,7 +127,7 @@ class ManagePacks extends React.Component {
 
     render() {
         const actionsError = [
-            <Link to={'/app/'}>
+            <Link to={'/'}>
                 <FlatButton
                     label="Back"
                     primary={true}
@@ -143,7 +143,7 @@ class ManagePacks extends React.Component {
                 label={pack.name}
             />
         );
-        const path = this.state.buttonState ? '/app/manageJars' : '/app/managePacks';
+        const path = this.state.buttonState ? '/service/jarManager' : '/service/packManager';
         return (
 
             <div className="container col-md-8">

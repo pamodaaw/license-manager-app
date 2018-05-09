@@ -17,20 +17,17 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory} from 'react-router';
-import FlatButton from 'material-ui/FlatButton';
+import {Link} from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
-import Dialog from 'material-ui/Dialog';
-import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
-import {ListItem, Paper, RadioButton, RadioButtonGroup, Subheader} from "material-ui";
+import {Paper} from "material-ui";
 
 /**
  * @class Initial Page
  * @extends {Component}
  * @description Get user details
  */
-class InitialPage extends React.Component {
+class InitialPage extends Component {
 
     constructor(props) {
         super(props);
@@ -62,7 +59,7 @@ class InitialPage extends React.Component {
 
                     <Link
                         to={{
-                            pathname: '/app/managePacks',
+                            pathname: '/service/packManager',
                         }}
                     >
                         <RaisedButton
