@@ -17,12 +17,10 @@
  */
 
 import React, {Component} from 'react';
-import {hashHistory} from 'react-router';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import AppHeader from '../components/AppHeader';
-import ValidateUser from '../services/authentication/ValidateUser';
 
 /**
  * @class Root
@@ -43,17 +41,17 @@ class Root extends Component {
     }
 
     componentWillMount() {
-        ValidateUser.getUserDetails().then((response) => {
-            if (response.isValid) {
-                this.setState(() => {
-                    return {
-                        userDetail: response,
-                    };
-                });
-            } else {
-                hashHistory.push('/');
-            }
-        });
+        // ValidateUser.getUserDetails().then((response) => {
+        //     if (response.isValid) {
+        //         this.setState(() => {
+        //             return {
+        //                 userDetail: response,
+        //             };
+        //         });
+        //     } else {
+        //         hashHistory.push('/');
+        //     }
+        // });
     }
 
     render() {
