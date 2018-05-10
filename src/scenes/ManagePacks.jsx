@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory,browserHistory} from 'react-router';
+import {Link} from 'react-router-dom';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -65,7 +65,7 @@ class ManagePacks extends Component {
             //         errorMessage: 'Network Error',
             //     };
             // });
-            // this.handleOpenError();
+            // this.errorMessageOpened();
             this.setState(() => {
                 return {
                     listOfPacks: [{"name": "wso2test-1.1.1.zip"}, {"name": "wso2test-1.0.3.zip"}, {"name": "wso2test-1.1.0.zip"}, {"name": "wso2is-analytics-5.4.0.zip"}, {"name": "wso2test-1.2.1.zip"}, {"name": "wso2ei-6.1.1.zip"}, {"name": "wso2test-1.0.1.zip"}]
@@ -84,7 +84,7 @@ class ManagePacks extends Component {
     handleOpenError() {
         this.setState(() => {
             return {
-                openError: true,
+                errorMessageOpened: true,
             };
         });
     }
@@ -95,16 +95,9 @@ class ManagePacks extends Component {
     handleCloseError() {
         this.setState(() => {
             return {
-                openError: false,
+                errorMessageOpened: false,
             };
         });
-    }
-
-    /**
-     * Redirects to the main page.
-     */
-    backToMain() {
-        hashHistory.push('/');
     }
 
     /**
@@ -143,7 +136,7 @@ class ManagePacks extends Component {
                 label={pack.name}
             />
         );
-        const path = this.state.buttonState ? '/service/jarManager' : '/service/packManager';
+        const path = this.state.buttonState ? '/jarManager' : '/packManager';
         return (
 
             <div className="container col-md-8">
@@ -161,6 +154,8 @@ class ManagePacks extends Component {
                             {listOfPackNames}
 
                         </RadioButtonGroup>
+                        {/*<Link to={path+'/'+this.state.selectedPack}>*/}
+
                         <Link
                             to={{
                                 pathname: path,

@@ -19,7 +19,6 @@
 import React, {Component} from 'react';
 import ValidateUser from '../services/authentication/ValidateUser';
 import logo from '../assets/images/logo-inverse.svg';
-import {Link} from "react-router";
 
 /**
  * @class AppHeader
@@ -51,25 +50,15 @@ class AppHeader extends Component {
 
     render() {
         return (
-            <nav className="navbar navbar-inverse" style={{backgroundColor: "#000000", height: '100%'}}>
-                <div className="container-fluid">
-
-                    <Link
-                        to={{
-                            pathname: '/',
-                        }}
-                    >
-                        <div className="navbar-header">
-                            <img id="logo" style={{height: '50px'}} src={logo} alt="wso2"/>
-                            <a className="navbar-brand" href=''
-                               style={{color: "#FBFCFC", fontSize: '40px', paddingLeft: '20px'}}>License Manager</a>
-                        </div>
-                    </Link>
-
+            <nav className="navbar navbar-inverse container-fluid" style={{backgroundColor: "#000000", height: '100%'}}>
+                    <div className="navbar-header">
+                        <img id="logo" style={{height: '50px'}} src={logo} alt="wso2"/>
+                        <a className="navbar-brand" href='/'
+                           style={{color: "#FBFCFC", fontSize: '40px', paddingLeft: '20px'}}>License Manager</a>
+                    </div>
                     <ul className="nav navbar-nav navbar-right">
                         <li><a style={{color: "#FBFCFC"}}>{this.state.username}</a></li>
                     </ul>
-                </div>
             </nav>
         );
     }

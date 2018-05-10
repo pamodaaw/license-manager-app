@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory, withRouter} from 'react-router';
+import {Link, withRouter} from 'react-router-dom';
 import {
     Table,
     TableHeader,
@@ -51,22 +51,22 @@ class AddLicense extends Component {
         this.state = {
             nameDefinedJars: this.props.location.state.nameMissingJars,
             packName: this.props.location.state.packName,
-            openError: false,
-            confirmLicense: false,
+            errorMessageOpened: false,
+            confirmMessageOpened: false,
+            recheckMessageOpened: false,
             displayProgress: 'block',
             displayFormLicense: 'none',
             displayDownload: 'none',
             displayComponentTable: 'none',
             displayLibraryTable: 'none',
             checked: false,
+            isDataValid: false,
             header: 'Add Licenses for the jars',
             licenseMissingComponents: [],
             licenseMissingLibraries: [],
             license: [],
             stepIndex: 2,
-            errorMessage: '',
-            isDataValid: false,
-            recheckDialog: false
+            errorMessage: ''
         };
         this.handleAddLicense = this.handleAddLicense.bind(this);
         this.handleComponentSelect = this.handleComponentSelect.bind(this);
@@ -138,7 +138,7 @@ class AddLicense extends Component {
             return {
                 displayProgress: 'block',
                 displayFormLicense: 'none',
-                confirmLicense: false,
+                confirmMessageOpened: false,
             };
         });
         ServiceManager.addLicense(this.state.licenseMissingComponents, this.state.licenseMissingLibraries).then((response) => {
@@ -161,14 +161,14 @@ class AddLicense extends Component {
         if (this.state.isDataValid) {
             this.setState(() => {
                 return {
-                    confirmLicense: true,
+                    confirmMessageOpened: true,
                 };
             });
         }
         else {
             this.setState(() => {
                 return {
-                    recheckDialog: true,
+                    recheckMessageOpened: true,
                 };
             });
         }
@@ -178,8 +178,8 @@ class AddLicense extends Component {
     closeConfirmation() {
         this.setState(() => {
             return {
-                confirmLicense: false,
-                recheckDialog: false
+                confirmMessageOpened: false,
+                recheckMessageOpened: false
             };
         });
     }
@@ -190,7 +190,7 @@ class AddLicense extends Component {
     openError() {
         this.setState(() => {
             return {
-                openError: true,
+                errorMessageOpened: true,
             };
         });
     }
@@ -201,7 +201,7 @@ class AddLicense extends Component {
     closeError() {
         this.setState(() => {
             return {
-                openError: false,
+                errorMessageOpened: false,
             };
         });
     }
@@ -210,8 +210,8 @@ class AddLicense extends Component {
      * Redirect to the next page based on the response.
      */
     redirectToNext() {
-        hashHistory.push({
-            pathname: '/service/licenseGenerator',
+        this.props.history.push({
+            pathname: '/licenseGenerator',
             state: {
                 packName: this.state.packName,
             }
@@ -229,30 +229,30 @@ class AddLicense extends Component {
         });
     }
 
+    /**
+     * Check whether licenses are selected for all the components and jars.
+     */
     validateFormData() {
         const components = this.state.licenseMissingComponents;
         const libraries = this.state.licenseMissingLibraries;
-        let areAllComponentsFilled = false;
-        let areAllLibrariesFilled = false;
+        let areAllComponentsFilled = true;
+        let areAllLibrariesFilled = true;
         if (components.length > 0) {
             for (let i = 0; i < components.length; i++) {
-                if (components[i].licenseKey !== "NEW") {
-                    areAllComponentsFilled = true;
+                if (components[i].licenseKey === "NEW") {
+                    areAllComponentsFilled = false;
+                    break;
                 }
             }
-        } else {
-            areAllComponentsFilled = true;
         }
         if (libraries.length > 0) {
             for (let i = 0; i < libraries.length; i++) {
-                if (libraries[i].licenseKey !== "NEW") {
-                    areAllLibrariesFilled = true;
+                if (libraries[i].licenseKey === "NEW") {
+                    areAllLibrariesFilled = false;
+                    break;
                 }
             }
-        } else {
-            areAllLibrariesFilled = true;
         }
-
         if (areAllComponentsFilled && areAllLibrariesFilled) {
             this.setState(() => {
                 return {
@@ -343,7 +343,7 @@ class AddLicense extends Component {
             />
         ];
         const actionsError = [
-            <Link to={'/service/packManager'}>
+            <Link to={'/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}
@@ -553,7 +553,7 @@ class AddLicense extends Component {
                     title="Error"
                     actions={actionsError}
                     modal={false}
-                    open={this.state.openError}
+                    open={this.state.errorMessageOpened}
                 >
                     {this.state.errorMessage}
                 </Dialog>
@@ -566,7 +566,7 @@ class AddLicense extends Component {
                     title="Confirm"
                     actions={licenseConfirmActions}
                     modal={false}
-                    open={this.state.confirmLicense}
+                    open={this.state.confirmMessageOpened}
                 >
                     Make sure you have added the correct licenses.
                 </Dialog>
@@ -575,7 +575,7 @@ class AddLicense extends Component {
                     title="Alert"
                     actions={recheckLicenses}
                     modal={false}
-                    open={this.state.recheckDialog}
+                    open={this.state.recheckMessageOpened}
                 >
                     Please add licenses to all jars.
                 </Dialog>

@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory, withRouter} from 'react-router';
+import {Link, withRouter} from 'react-router-dom';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -38,7 +38,7 @@ class GenerateLicense extends Component {
         super(props);
         this.state = {
             packName: this.props.location.state.packName,
-            openError: false,
+            errorMessageOpened: false,
             displayStatus: 'none',
             displayForm: 'none',
             displayLoader: 'none',
@@ -49,8 +49,8 @@ class GenerateLicense extends Component {
             stepIndex: 3,
             errorMessage: '',
         };
-        this.handleOpenError = this.handleOpenError.bind(this);
-        this.handleCloseError = this.handleCloseError.bind(this);
+        this.openError = this.openError.bind(this);
+        this.closeError = this.closeError.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
         this.generateLicense = this.generateLicense.bind(this);
         this.backToMain = this.backToMain.bind(this);
@@ -73,49 +73,63 @@ class GenerateLicense extends Component {
                 displayDownload: 'none',
             };
         });
-        ServiceManager.getLicense().then(() => {
-            ServiceManager.dowloadLicense().then((responseFile) => {
-                const url = window.URL.createObjectURL(new Blob([responseFile.data]));
-                const link = document.createElement('a');
-                const fileNameLength = this.state.packName.length;
-                const fileName = 'License(' + this.state.packName.substring(0, fileNameLength - 4) + ').TXT';
-                link.href = url;
-                link.setAttribute('download', fileName);
-                document.body.appendChild(link);
-                link.click();
-                this.setState(() => {
-                    return {
-                        displayForm: 'none',
-                        displayDownload: 'block',
-                        displayLoader: 'none',
-                    };
+        ServiceManager.getLicense().then((response) => {
+            if (response.data.responseType === "Done") {
+                ServiceManager.dowloadLicense().then((responseFile) => {
+                    const url = window.URL.createObjectURL(new Blob([responseFile.data]));
+                    const link = document.createElement('a');
+                    const fileNameLength = this.state.packName.length;
+                    const fileName = 'License(' + this.state.packName.substring(0, fileNameLength - 4) + ').TXT';
+                    link.href = url;
+                    link.setAttribute('download', fileName);
+                    document.body.appendChild(link);
+                    link.click();
+                    this.setState(() => {
+                        return {
+                            displayForm: 'none',
+                            displayDownload: 'block',
+                            displayLoader: 'none',
+                        };
+                    });
+                }).catch(() => {
+                    this.handleError("Network Error");
                 });
-            }).catch((error) => {
-                throw new Error(error);
-            });
-        }).catch((error) => {
-            throw new Error(error);
+            } else {
+                this.handleError("Failed to generate license text");
+
+            }
+        }).catch(() => {
+            this.handleError("Network Error");
         });
     }
 
     /**
      * Handle open error message.
      */
-    handleOpenError() {
+    openError() {
         this.setState(() => {
             return {
-                openError: true,
+                errorMessageOpened: true,
             };
         });
+    }
+
+    handleError(message) {
+        this.setState(() => {
+            return {
+                errorMessage: message,
+            };
+        });
+        this.openError();
     }
 
     /**
      * Handle close error message.
      */
-    handleCloseError() {
+    closeError() {
         this.setState(() => {
             return {
-                openError: false,
+                errorMessageOpened: false,
             };
         });
     }
@@ -128,15 +142,17 @@ class GenerateLicense extends Component {
     }
 
     /**
-     * Redirects to the main page.
+     * Redirect to the main page.
      */
     backToMain() {
-        hashHistory.push('/');
+        this.props.history.push({
+            pathname: '/'
+        });
     }
 
     render() {
         const actionsError = [
-            <Link to={'/service/packManager'}>
+            <Link to={'/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}
@@ -181,7 +197,7 @@ class GenerateLicense extends Component {
                     title="Error"
                     actions={actionsError}
                     modal={false}
-                    open={this.state.openError}
+                    open={this.state.errorMessageOpened}
                 >
                     {this.state.errorMessage}
                 </Dialog>
@@ -191,5 +207,6 @@ class GenerateLicense extends Component {
         );
     }
 }
+
 GenerateLicense = withRouter(GenerateLicense);
 export default GenerateLicense;

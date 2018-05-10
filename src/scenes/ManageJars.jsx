@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Link, hashHistory, withRouter} from 'react-router';
+import {Link, withRouter} from 'react-router-dom';
 import {
     Table,
     TableHeader,
@@ -203,7 +203,7 @@ class ManageJars extends Component {
     openError() {
         this.setState(() => {
             return {
-                openError: true,
+                errorMessageOpened: true,
             };
         });
     }
@@ -214,7 +214,7 @@ class ManageJars extends Component {
     closeError() {
         this.setState(() => {
             return {
-                openError: false,
+                errorMessageOpened: false,
             };
         });
     }
@@ -223,8 +223,8 @@ class ManageJars extends Component {
      * Redirect to the next page based on the response.
      */
     redirectToNext() {
-        this.props.router.push({
-            pathname: '/service/licenseAdder',
+        this.props.history.push({
+            pathname: '/licenseAdder',
             state: {
                 packName: this.state.packName,
                 nameMissingJars: this.state.nameMissingJars,
@@ -243,7 +243,7 @@ class ManageJars extends Component {
      * Redirect to the main page.
      */
     backToMain() {
-        hashHistory.push('/');
+        // hashHistory.push('/');
     }
 
     render() {
@@ -260,7 +260,7 @@ class ManageJars extends Component {
             />,
         ];
         const actionsError = [
-            <Link to={'/service/packManager'}>
+            <Link to={'/packManager'}>
                 <FlatButton
                     label="Back"
                     primary={true}

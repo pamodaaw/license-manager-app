@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import RaisedButton from 'material-ui/RaisedButton';
 import styles from '../styles';
 import {Paper} from "material-ui";
@@ -44,7 +44,6 @@ class InitialPage extends Component {
 
     render() {
         return (
-
             <div className="container col-md-8">
                 <Paper style={styles.welcomeNote} zDepth={5}>
                     <div style={{textAlign: "center", fontSize: '50px', padding: '5%',}}>
@@ -57,11 +56,7 @@ class InitialPage extends Component {
                         </p>
                     </div>
 
-                    <Link
-                        to={{
-                            pathname: '/service/packManager',
-                        }}
-                    >
+                    <Link to={'/packManager'}>
                         <RaisedButton
                             type="submit"
                             label="Click to Generate License"

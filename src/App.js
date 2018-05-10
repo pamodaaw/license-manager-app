@@ -16,49 +16,61 @@
  * under the License.
  */
 
-import React, { Component } from 'react';
-import { Router, Route, browserHistory,hashHistory} from 'react-router';
-import Root from './scenes/Root';
+import React, {Component} from 'react';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import ManagePacks from './scenes/ManagePacks';
 import ManageJars from './scenes/ManageJars';
 import AddLicense from './scenes/AddLicense';
 import GenerateLicense from './scenes/GenerateLicense';
 import frontPage from './scenes/InitialPage'
-import IndexRoute from "react-router/es/IndexRoute";
+import lightBaseTheme from "material-ui/styles/baseThemes/lightBaseTheme";
+import getMuiTheme from "material-ui/styles/getMuiTheme";
+import {MuiThemeProvider} from "material-ui";
+import AppHeader from "./components/AppHeader";
+
 // import './App.css';
 
 class App extends Component {
-  render() {
-    return (
-//        <Router >
-  //          <Route path={'/service'} component={Root} history={browserHistory} >
-    //            <IndexRoute component={frontPage} />
-      //          <Route path={'packManager'} component={ManagePacks} />
-        //        <Route path={'jarManager'} component={ManageJars} />
-          //      <Route path={'licenseGenerator'} component={GenerateLicense} />
-//                <Route path={'licenseAdder'} component={AddLicense} />
-//                <Route path={'/'} component={frontPage} />
-//            </Route>
-//        </Router>
-        <Router history={hashHistory}>
-            <Route path={'/service'} component={Root} >
-                <Route path={'packManager'} component={ManagePacks} />
-                <Route path={'jarManager'} component={ManageJars} />
-                <Route path={'licenseGenerator'} component={GenerateLicense} />
-                <Route path={'licenseAdder'} component={AddLicense} />
-                <Route path={'/'} component={frontPage} />
-            </Route>
-        </Router>
+    render() {
+        return (
 
-  //       <Router>
-  //       <Route path="/" component={Main} history={browserHistory}>
-  //         <IndexRoute component={Home} />
-  //     <Route path="/cars" component={Car}/>
-  //     <Route path="/about" component={About}/>
-  // </Route>
-  // </Router>
-    );
-  }
+            <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+                <div className="container-fluid" style={{paddingLeft: '0px', paddingRight: '0px'}}>
+
+                    <div className="nav container-fluid"
+                         style={{
+                             paddingLeft: '0px',
+                             paddingRight: '0px',
+                             height: '80px'
+                         }}>
+                        <AppHeader/>
+                    </div>
+
+                    <div className="container">
+                        <div className="col-sm-12"
+                             style={{
+                                 height: '100%',
+                                 width: '100%',
+                                 marginLeft: '1%',
+                                 marginRight: '1%',
+                                 paddingLeft: '2%',
+                                 paddingRight: '2%'
+                             }}>
+                            <BrowserRouter basename='/t/wso2internalstg/licenseManager'>
+                                <Switch>
+                                    <Route path={'/packManager'} component={ManagePacks}/>
+                                    <Route path={'/jarManager'} component={ManageJars}/>
+                                    <Route path={'/licenseGenerator'} component={GenerateLicense}/>
+                                    <Route path={'/licenseAdder'} component={AddLicense}/>
+                                    <Route path={'/'} component={frontPage}/>
+                                </Switch>
+                            </BrowserRouter>
+                        </div>
+                    </div>
+                </div>
+            </MuiThemeProvider>
+        );
+    }
 }
 
 export default App;

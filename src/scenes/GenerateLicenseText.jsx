@@ -45,7 +45,7 @@ class GenerateLicense extends Component {
             nameMissingJars: [],
             nameJars: [],
             openSaveData: false,
-            openError: false,
+            errorMessageOpened: false,
             openLicense: false,
             confirmLicense: false,
             errorIcon: '',
@@ -72,8 +72,8 @@ class GenerateLicense extends Component {
         this.handleLibrarySelect = this.handleLibrarySelect.bind(this);
         this.handleOpenSaveData = this.handleOpenSaveData.bind(this);
         this.handleCloseSaveDate = this.handleCloseSaveDate.bind(this);
-        this.handleOpenError = this.handleOpenError.bind(this);
-        this.handleCloseError = this.handleCloseError.bind(this);
+        this.openError = this.handleOpenError.bind(this);
+        this.closeError = this.handleCloseError.bind(this);
         this.handleOpenConfirm = this.handleOpenConfirm.bind(this);
         this.handleCloseConfirm = this.handleCloseConfirm.bind(this);
         this.handleNext = this.handleNext.bind(this);
@@ -153,7 +153,7 @@ class GenerateLicense extends Component {
                                     errorMessage: response.data.responseMessage,
                                 };
                             });
-                            this.handleOpenError();
+                            this.openError();
                         }
                     }).catch((error) => {
                         throw new Error(error);
@@ -292,7 +292,7 @@ class GenerateLicense extends Component {
             return {
                 displayProgress: 'block',
                 displayFormLicense: 'none',
-                confirmLicense: false,
+                confirmMessageOpened: false,
             };
         });
         ServiceManager.addLicense(this.state.licenseMissingComponents, this.state.licenseMissingLibraries).then((responseNxt) => {
@@ -392,7 +392,7 @@ class GenerateLicense extends Component {
     handleOpenConfirm() {
         this.setState(() => {
             return {
-                confirmLicense: true,
+                confirmMessageOpened: true,
             };
         });
     }
@@ -400,7 +400,7 @@ class GenerateLicense extends Component {
     handleCloseConfirm() {
         this.setState(() => {
             return {
-                confirmLicense: false,
+                confirmMessageOpened: false,
             };
         });
     }
@@ -411,7 +411,7 @@ class GenerateLicense extends Component {
     handleOpenError() {
         this.setState(() => {
             return {
-                openError: true,
+                errorMessageOpened: true,
             };
         });
     }
@@ -422,7 +422,7 @@ class GenerateLicense extends Component {
     handleCloseError() {
         this.setState(() => {
             return {
-                openError: false,
+                errorMessageOpened: false,
             };
         });
     }
@@ -439,7 +439,7 @@ class GenerateLicense extends Component {
      * reload page
      */
     backToMain() {
-        hashHistory.push('/');
+        push('/');
     }
 
     /**
@@ -791,7 +791,7 @@ class GenerateLicense extends Component {
                     title="Error"
                     actions={actionsError}
                     modal={false}
-                    open={this.state.openError}
+                    open={this.state.errorMessageOpened}
                     onRequestClose={this.goBackToRequest}
                 >
                     {this.state.errorMessage}
