@@ -18,14 +18,7 @@
 
 import React, {Component} from 'react';
 import {Link, withRouter} from 'react-router-dom';
-import {
-    Table,
-    TableHeader,
-    TableHeaderColumn,
-    TableRow,
-    TableBody,
-    TableRowColumn,
-} from 'material-ui/Table';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn,} from 'material-ui/Table';
 import Subheader from 'material-ui/Subheader';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -398,7 +391,6 @@ class AddLicense extends Component {
                                 maxHeight={200}
                                 underlineStyle={{borderColor: '#00bcd461'}}
                                 selectedMenuItemStyle={{color: '#17A589'}}
-
                             >
                                 {license}
                             </SelectField>
@@ -466,33 +458,23 @@ class AddLicense extends Component {
                         <Table style={{overflow: 'auto'}}>>
                             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                 <TableRow key={0}>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '35%'
-                                    }}>Name</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>Version</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>Type</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>License</TableHeaderColumn>
-                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
-                                        License</TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '35%'}}>
+                                        Name
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        Version
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        Type
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        License
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>
+                                        Select License</TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody displayRowCheckbox={false}
-                                       showRowHover={true}
-                            >
+                            <TableBody displayRowCheckbox={false} showRowHover={true}>
                                 {component}
                             </TableBody>
                         </Table>
@@ -503,33 +485,24 @@ class AddLicense extends Component {
                         <Table style={{overflow: 'auto'}}>
                             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                 <TableRow key={0}>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '35%'
-                                    }}>Name</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>Version</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>Type</TableHeaderColumn>
-                                    <TableHeaderColumn style={{
-                                        fontSize: '20px',
-                                        color: "#000000",
-                                        width: '15%'
-                                    }}>License</TableHeaderColumn>
-                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>Select
-                                        License</TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '35%'}}>
+                                        Name
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        Version
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        Type
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '15%'}}>
+                                        License
+                                    </TableHeaderColumn>
+                                    <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>
+                                        Select License
+                                    </TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody displayRowCheckbox={false}
-                                       showRowHover={true}
-                            >
+                            <TableBody displayRowCheckbox={false} showRowHover={true}>
                                 {library}
                             </TableBody>
                         </Table>

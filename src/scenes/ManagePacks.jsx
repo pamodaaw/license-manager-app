@@ -60,21 +60,12 @@ class ManagePacks extends Component {
                 };
             });
         }).catch(() => {
-            // this.setState(() => {
-            //     return {
-            //         errorMessage: 'Network Error',
-            //     };
-            // });
-            // this.errorMessageOpened();
             this.setState(() => {
                 return {
-                    listOfPacks: [{"name": "wso2test-1.1.1.zip"}, {"name": "wso2test-1.0.3.zip"}, {"name": "wso2test-1.1.0.zip"}, {"name": "wso2is-analytics-5.4.0.zip"}, {"name": "wso2test-1.2.1.zip"}, {"name": "wso2ei-6.1.1.zip"}, {"name": "wso2test-1.0.1.zip"}]
-                    ,
-                    displayForm: 'block',
-
+                    errorMessage: 'Network Error',
                 };
             });
-
+            this.handleOpenError();
         });
     }
 
@@ -150,11 +141,10 @@ class ManagePacks extends Component {
 
                 <div style={{padding:'5%'}}>
                     <form style={{display: this.state.displayForm}}>
+
                         <RadioButtonGroup onChange={this.selectPack} value={this.state.selectedPack}>
                             {listOfPackNames}
-
                         </RadioButtonGroup>
-                        {/*<Link to={path+'/'+this.state.selectedPack}>*/}
 
                         <Link
                             to={{

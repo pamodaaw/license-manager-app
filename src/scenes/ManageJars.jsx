@@ -18,20 +18,14 @@
 
 import React, {Component} from 'react';
 import {Link, withRouter} from 'react-router-dom';
-import {
-    Table,
-    TableHeader,
-    TableHeaderColumn,
-    TableRow,
-    TableBody,
-    TableRowColumn,
-} from 'material-ui/Table';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn,} from 'material-ui/Table';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
+import basicStyles from '../App.css'
 import {Paper} from "material-ui";
 import StepComponent from "../components/StepComponent";
 import ProgressComponent from "../components/ProgressComponent";
@@ -47,7 +41,7 @@ class ManageJars extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            packName: props.location.query.selectedPack,//eslint-disable-line
+            // packName: props.location.query.selectedPack,//eslint-disable-line
             header: 'Define name and version of jars',
             nameMissingJars: [],
             // nameDefinedJars: [],
@@ -110,7 +104,7 @@ class ManageJars extends Component {
                         } else {
                             this.handleError(responseNext.data.responseMessage)
                         }
-                    }).catch((error) => {
+                    }).catch(() => {
                         this.handleError("Network Error")
                     });
 
@@ -121,18 +115,16 @@ class ManageJars extends Component {
             }
         }).catch(() => {
 
-            // this.setState(() => {
-            //     return {
-            //         nameMissingJars:             [{"index":0,"name":"patcsssssssssssssssssssssssh.jar","version":"patch.jar"}],
-            //
-            //         // nameDefinedJars: response.data.responseData,
-            //         displayProgress: 'none',
-            //         displayStatus: 'block',
-            //         displayForm: 'block',
-            //     };
-            // });
+            this.setState(() => {
+                return {
+                    nameMissingJars: [{"index":0,"name":"patch","jarFileName":"patch.jar","version":"1.0.0"}],
+                    displayProgress: 'none',
+                    displayStatus: 'block',
+                    displayForm: 'block',
+                };
+            });
 
-            this.handleError("Network Error");
+            // this.handleError("Network Error");
         });
 
     }
@@ -232,6 +224,7 @@ class ManageJars extends Component {
         });
 
     }
+
     /**
      * Reload page.
      */
@@ -303,7 +296,7 @@ class ManageJars extends Component {
         }
 
         return (
-            <div className="container" style={{overflow:'auto'}}>
+            <div className="container" style={{overflow: 'auto'}}>
                 <HeaderComponent header={this.state.header}/>
                 <StepComponent
                     step={this.state.stepIndex}
@@ -314,21 +307,15 @@ class ManageJars extends Component {
                     <Table style={{overflow: 'auto'}}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow key={0}>
-                                <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '45%'}}>JAR File
+                                <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '45%'}}>
+                                    JAR File Name</TableHeaderColumn>
+                                <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '35%'}}>
                                     Name</TableHeaderColumn>
-                                <TableHeaderColumn
-                                    style={{fontSize: '20px', color: "#000000", width: '35%'}}>Name</TableHeaderColumn>
-                                <TableHeaderColumn style={{
-                                    fontSize: '20px',
-                                    color: "#000000",
-                                    width: '20%'
-                                }}>Version</TableHeaderColumn>
+                                <TableHeaderColumn style={{fontSize: '20px', color: "#000000", width: '20%'}}>
+                                    Version</TableHeaderColumn>
                             </TableRow>
                         </TableHeader>
-                        <TableBody
-                            displayRowCheckbox={false}
-                            showRowHover={true}
-                        >
+                        <TableBody displayRowCheckbox={false} showRowHover={true}>
                             {table}
                         </TableBody>
                     </Table>
@@ -377,7 +364,6 @@ class ManageJars extends Component {
                     Are you sure you want to save this data ?
                 </Dialog>
             </div>
-
         );
     }
 }

@@ -39,9 +39,6 @@ class GenerateLicense extends Component {
         this.state = {
             packName: this.props.location.state.packName,
             errorMessageOpened: false,
-            displayStatus: 'none',
-            displayForm: 'none',
-            displayLoader: 'none',
             displayDownload: 'block',
             displayErrorBox: 'none',
             buttonState: false,
@@ -67,12 +64,7 @@ class GenerateLicense extends Component {
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        this.setState(() => {
-            return {
-                displayForm: 'none',
-                displayDownload: 'none',
-            };
-        });
+
         ServiceManager.getLicense().then((response) => {
             if (response.data.responseType === "Done") {
                 ServiceManager.dowloadLicense().then((responseFile) => {
@@ -86,9 +78,7 @@ class GenerateLicense extends Component {
                     link.click();
                     this.setState(() => {
                         return {
-                            displayForm: 'none',
                             displayDownload: 'block',
-                            displayLoader: 'none',
                         };
                     });
                 }).catch(() => {
@@ -104,6 +94,19 @@ class GenerateLicense extends Component {
     }
 
     /**
+     * Set a customized error message and open the dialog.
+     * @param message
+     */
+    handleError(message) {
+        this.setState(() => {
+            return {
+                errorMessage: message,
+            };
+        });
+        this.openError();
+    }
+
+    /**
      * Handle open error message.
      */
     openError() {
@@ -112,15 +115,6 @@ class GenerateLicense extends Component {
                 errorMessageOpened: true,
             };
         });
-    }
-
-    handleError(message) {
-        this.setState(() => {
-            return {
-                errorMessage: message,
-            };
-        });
-        this.openError();
     }
 
     /**
@@ -163,19 +157,13 @@ class GenerateLicense extends Component {
         return (
             <div className="container">
                 <HeaderComponent header={this.state.header}/>
-                <StepComponent
-                    step={this.state.stepIndex}
-                />
+                <StepComponent step={this.state.stepIndex}/>
                 <form onSubmit={this.generateLicense} style={{display: this.state.displayDownload}}>
-                    <br/>
-                    <br/>
                     <div style={styles.downloadArea}>
                         <img src={textFile} style={styles.textFile} alt=""/>
                         <br/>
                         <span>
-                            <b>
-                                {'License(' + this.state.packName.substring(0, this.state.packName.length - 4) + ').TXT'}
-                            </b>
+                            <b>{'License(' + this.state.packName.substring(0, this.state.packName.length - 4) + ').TXT'}</b>
                         </span>
                     </div>
                     <br/>

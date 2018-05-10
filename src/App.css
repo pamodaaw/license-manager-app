@@ -27,4 +27,25 @@
   to { transform: rotate(360deg); }
 }
 
+/* Navigation bar styles*/
+.app-header {
+    padding-left: 0;
+    padding-right: 0;
+    height: 80px;
+}
 
+/* Body styles*/
+.app-body{
+    height: 100%;
+    width: 100%;
+    margin-left: 1%;
+    margin-right: 1%;
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+/* Table styles */
+.table-header{
+    font-size: 20px;
+    color: #000000;
+}

@@ -52,7 +52,7 @@ class AppHeader extends Component {
         return (
             <nav className="navbar navbar-inverse container-fluid" style={{backgroundColor: "#000000", height: '100%'}}>
                     <div className="navbar-header">
-                        <img id="logo" style={{height: '50px'}} src={logo} alt="wso2"/>
+                        <a href='/'><img id="logo" style={{height: '50px'}} src={logo} alt="wso2"/></a>
                         <a className="navbar-brand" href='/'
                            style={{color: "#FBFCFC", fontSize: '40px', paddingLeft: '20px'}}>License Manager</a>
                     </div>

@@ -37,25 +37,12 @@ class App extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
                 <div className="container-fluid" style={{paddingLeft: '0px', paddingRight: '0px'}}>
 
-                    <div className="nav container-fluid"
-                         style={{
-                             paddingLeft: '0px',
-                             paddingRight: '0px',
-                             height: '80px'
-                         }}>
+                    <div className="nav container-fluid app-header">
                         <AppHeader/>
                     </div>
 
                     <div className="container">
-                        <div className="col-sm-12"
-                             style={{
-                                 height: '100%',
-                                 width: '100%',
-                                 marginLeft: '1%',
-                                 marginRight: '1%',
-                                 paddingLeft: '2%',
-                                 paddingRight: '2%'
-                             }}>
+                        <div className="col-sm-12 app-body">
                             <BrowserRouter basename='/t/wso2internalstg/licenseManager'>
                                 <Switch>
                                     <Route path={'/packManager'} component={ManagePacks}/>
