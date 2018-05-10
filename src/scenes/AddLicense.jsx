@@ -114,6 +114,10 @@ class AddLicense extends Component {
         });
     }
 
+    /**
+     * Set a customize message and open error dialog.
+     * @param message
+     */
     handleError(message) {
         this.setState(() => {
             return {
@@ -123,6 +127,10 @@ class AddLicense extends Component {
         this.openError();
     }
 
+    /**
+     * Handle the form submission to add licenses.
+     * @param e
+     */
     handleAddLicense(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -145,6 +153,10 @@ class AddLicense extends Component {
         });
     }
 
+    /**
+     * Open a dialog to confirm the submission of licenses.
+     * @param e
+     */
     openConfirmation(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -168,6 +180,9 @@ class AddLicense extends Component {
 
     }
 
+    /**
+     * Close submit confirmation dialog.
+     */
     closeConfirmation() {
         this.setState(() => {
             return {
@@ -178,7 +193,7 @@ class AddLicense extends Component {
     }
 
     /**
-     * Handle open error message
+     * Handle open error message.
      */
     openError() {
         this.setState(() => {
@@ -189,7 +204,7 @@ class AddLicense extends Component {
     }
 
     /**
-     * Handle close error message
+     * Handle close error message.
      */
     closeError() {
         this.setState(() => {

@@ -25,7 +25,6 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import ServiceManager from '../services/msf4j/ServiceManager';
 import styles from '../styles';
-import basicStyles from '../App.css'
 import {Paper} from "material-ui";
 import StepComponent from "../components/StepComponent";
 import ProgressComponent from "../components/ProgressComponent";
@@ -41,10 +40,9 @@ class ManageJars extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // packName: props.location.query.selectedPack,//eslint-disable-line
+            packName: props.location.query.selectedPack,//eslint-disable-line
             header: 'Define name and version of jars',
             nameMissingJars: [],
-            // nameDefinedJars: [],
             openSaveData: false,
             openError: false,
             buttonState: false,
@@ -59,10 +57,8 @@ class ManageJars extends Component {
         this.handleCloseSaveData = this.handleCloseSaveData.bind(this);
         this.openError = this.openError.bind(this);
         this.closeError = this.closeError.bind(this);
-        this.reloadPage = this.reloadPage.bind(this);
         this.setName = this.setName.bind(this);
         this.setVersion = this.setVersion.bind(this);
-        this.backToMain = this.backToMain.bind(this);
         this.redirectToNext = this.redirectToNext.bind(this);
     }
 
@@ -85,7 +81,6 @@ class ManageJars extends Component {
                                 this.setState(() => {
                                     return {
                                         nameMissingJars: responseNext.data.responseData,
-                                        // nameDefinedJars: response.data.responseData,
                                         displayProgress: 'none',
                                         displayStatus: 'none',
                                         displayForm: 'block',
@@ -98,7 +93,6 @@ class ManageJars extends Component {
                                 return {
                                     statusMessage: responseNext.data.responseMessage,
                                     displayStatus: 'block',
-
                                 };
                             });
                         } else {
@@ -107,26 +101,13 @@ class ManageJars extends Component {
                     }).catch(() => {
                         this.handleError("Network Error")
                     });
-
                 }.bind(this), 5000);
-
             } else {
                 this.handleError(response.data.responseMessage);
             }
         }).catch(() => {
-
-            this.setState(() => {
-                return {
-                    nameMissingJars: [{"index":0,"name":"patch","jarFileName":"patch.jar","version":"1.0.0"}],
-                    displayProgress: 'none',
-                    displayStatus: 'block',
-                    displayForm: 'block',
-                };
-            });
-
-            // this.handleError("Network Error");
+            this.handleError("Network Error");
         });
-
     }
 
     /**
@@ -177,7 +158,6 @@ class ManageJars extends Component {
         });
     }
 
-
     /**
      * Handle the save data confirmation dialog close.
      */
@@ -190,7 +170,7 @@ class ManageJars extends Component {
     }
 
     /**
-     * handle open error message.
+     * Handle open error message.
      */
     openError() {
         this.setState(() => {
@@ -222,21 +202,6 @@ class ManageJars extends Component {
                 nameMissingJars: this.state.nameMissingJars,
             }
         });
-
-    }
-
-    /**
-     * Reload page.
-     */
-    reloadPage() {
-        window.location.reload();
-    }
-
-    /**
-     * Redirect to the main page.
-     */
-    backToMain() {
-        // hashHistory.push('/');
     }
 
     render() {
