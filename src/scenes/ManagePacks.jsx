@@ -38,7 +38,7 @@ class ManagePacks extends Component {
         this.state = {
             listOfPacks: [],
             selectedPack: '',
-            openError: false,
+            errorMessageOpened: false,
             errorMessage: '',
             displayForm: 'none',
             displayErrorBox: 'none',
@@ -48,25 +48,37 @@ class ManagePacks extends Component {
         this.reloadPage = this.reloadPage.bind(this);
         this.handleOpenError = this.handleOpenError.bind(this);
         this.handleCloseError = this.handleCloseError.bind(this);
+        this.handleError = this.handleError.bind(this);
     }
 
     componentWillMount() {
         ServiceManager.getUploadedPacks().then((response) => {
-            this.setState(() => {
-                return {
-                    listOfPacks: response.data.responseData,
-                    displayForm: 'block',
-
-                };
-            });
+            if (response.data.responseType === 'done') {
+                this.setState(() => {
+                    return {
+                        listOfPacks: response.data.responseData,
+                        displayForm: 'block',
+                    };
+                });
+            } else {
+                this.handleError(response.data.responseMessage);
+            }
         }).catch(() => {
-            this.setState(() => {
-                return {
-                    errorMessage: 'Network Error',
-                };
-            });
-            this.handleOpenError();
+            this.handleError('Network Error');
         });
+    }
+
+    /**
+     * For all errors display customized message.
+     * @param message
+     */
+    handleError(message) {
+        this.setState(() => {
+            return {
+                errorMessage: message,
+            };
+        });
+        this.handleOpenError();
     }
 
     /**
@@ -132,14 +144,14 @@ class ManagePacks extends Component {
 
             <div className="container col-md-8">
                 <HeaderComponent header="Select a Pack to Generate Licence"/>
-                <div >
+                <div>
                     <Paper style={styles.initialNote}>
                         <strong>Note: </strong> Please upload your pack to the given location.
                     </Paper>
 
                 </div>
 
-                <div style={{padding:'5%'}}>
+                <div style={{padding: '5%'}}>
                     <form style={{display: this.state.displayForm}}>
 
                         <RadioButtonGroup onChange={this.selectPack} value={this.state.selectedPack}>
@@ -166,7 +178,7 @@ class ManagePacks extends Component {
                         title="Error"
                         actions={actionsError}
                         modal={false}
-                        open={this.state.openError}
+                        open={this.state.errorMessageOpened}
                         onRequestClose={this.backToMain}
                     >
                         {this.state.errorMessage}

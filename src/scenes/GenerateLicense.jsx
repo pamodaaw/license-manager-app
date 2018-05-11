@@ -66,7 +66,7 @@ class GenerateLicense extends Component {
         e.nativeEvent.stopImmediatePropagation();
 
         ServiceManager.getLicense().then((response) => {
-            if (response.data.responseType === "Done") {
+            if (response.data.responseType === "done") {
                 ServiceManager.dowloadLicense().then((responseFile) => {
                     const url = window.URL.createObjectURL(new Blob([responseFile.data]));
                     const link = document.createElement('a');

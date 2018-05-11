@@ -65,7 +65,7 @@ class ManageJars extends Component {
     componentWillMount() {
 
         ServiceManager.extractJars(this.state.packName).then((response) => {
-            if (response.data.responseType === 'Done') {
+            if (response.data.responseType === 'done') {
                 this.setState(() => {
                     return {
                         statusMessage: response.data.responseMessage,
@@ -74,7 +74,7 @@ class ManageJars extends Component {
                 });
                 let intervalID = setInterval(function () {
                     ServiceManager.checkProgress().then((responseNext) => {
-                        if (responseNext.data.responseStatus === "complete") {
+                        if (responseNext.data.responseStatus === 'complete' && responseNext.data.responseType === 'done') {
                             if (responseNext.data.responseData.length === 0) {
                                 this.redirectToNext();
                             } else {
@@ -88,7 +88,7 @@ class ManageJars extends Component {
                                 });
                             }
                             clearTimeout(intervalID);
-                        } else if (responseNext.data.responseStatus === "running") {
+                        } else if (responseNext.data.responseStatus === 'running' && responseNext.data.responseType === 'done') {
                             this.setState(() => {
                                 return {
                                     statusMessage: responseNext.data.responseMessage,
@@ -261,7 +261,7 @@ class ManageJars extends Component {
         }
 
         return (
-            <div className="container" style={{overflow: 'auto'}}>
+            <div className="container">
                 <HeaderComponent header={this.state.header}/>
                 <StepComponent
                     step={this.state.stepIndex}

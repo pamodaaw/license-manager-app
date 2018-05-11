@@ -76,7 +76,7 @@ class AddLicense extends Component {
 
     componentWillMount() {
         ServiceManager.selectLicense().then((response) => {
-            if (response.data.responseType === "Done") {
+            if (response.data.responseType === "done") {
                 if (response.data.responseData.length !== 0) {
                     this.setState(() => {
                         return {
@@ -91,7 +91,7 @@ class AddLicense extends Component {
             this.handleError("Network Error");
         });
         ServiceManager.enterJars(this.state.nameDefinedJars).then((response) => {
-            if (response.data.responseType === "Done") {
+            if (response.data.responseType === "done") {
                 if (response.data.component.length === 0 && response.data.library.length === 0) {
                     this.redirectToNext();
                 } else {
@@ -143,7 +143,7 @@ class AddLicense extends Component {
             };
         });
         ServiceManager.addLicense(this.state.licenseMissingComponents, this.state.licenseMissingLibraries).then((response) => {
-            if (response.data.responseType === 'Done') {
+            if (response.data.responseType === 'done') {
                 this.redirectToNext();
             } else {
                 this.handleError(response.data.responseMessage)
