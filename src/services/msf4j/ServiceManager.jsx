@@ -32,7 +32,7 @@ class ServiceManager extends Component {
      * @returns {Promise<AxiosResponse<any>>}
      */
     getUploadedPacks() {
-        const url = MainData.microServiceURL + 'pack/list';
+        const url = MainData.microServiceURL + 'pack/uploadedPacks';
         const requestConfig = { withCredentials: true, timeout: 40000000 };
 
         return axios.get(url, requestConfig).then((response) => {
@@ -47,7 +47,7 @@ class ServiceManager extends Component {
      * @returns {Promise<AxiosResponse<any>>}
      */
     selectLicense() {
-        const url = MainData.microServiceURL + 'license/list';
+        const url = MainData.microServiceURL + 'license/availableLicenses';
         const requestConfig = { withCredentials: true };
         return axios.get(url, requestConfig).then((response) => {
             return response;
@@ -74,7 +74,7 @@ class ServiceManager extends Component {
      * Call the micro service to download the license text.
      * @returns {Promise<AxiosResponse<any>>}
      */
-    dowloadLicense() {
+    downloadLicense() {
         const url = MainData.microServiceURL + 'license/textToDownload';
         const requestConfig = { withCredentials: true, timeout: 30000 };
         return axios.get(url, requestConfig).then((response) => {
@@ -90,7 +90,7 @@ class ServiceManager extends Component {
      * @returns {Promise<AxiosResponse<any>>}
      */
     extractJars(selectedPack) {
-        const url = MainData.microServiceURL + 'pack/jars';
+        const url = MainData.microServiceURL + 'pack/selectedPack';
         const requestConfig = {
             withCredentials: true,
         };
@@ -112,7 +112,7 @@ class ServiceManager extends Component {
             withCredentials: true,
         };
         const requestData = {
-            jars: data,
+            jars : data,
         };
         return axios.post(url, requestData, requestConfig).then((response) => {
             return response;
@@ -148,7 +148,19 @@ class ServiceManager extends Component {
      * @returns {Promise<AxiosResponse<any>>}
      */
     checkProgress() {
-        const url = MainData.microServiceURL + 'progress';
+        const url = MainData.microServiceURL + 'packExtraction/progress';
+        const requestConfig = {
+            withCredentials: true,
+        };
+        return axios.get(url, requestConfig).then((response) => {
+            return response;
+        }).catch((error) => {
+            throw error
+        });
+    }
+
+    getFaultyNamedJars(){
+        const url = MainData.microServiceURL + 'pack/faultyNamedJars';
         const requestConfig = {
             withCredentials: true,
         };

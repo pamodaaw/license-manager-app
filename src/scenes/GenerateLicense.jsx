@@ -50,7 +50,7 @@ class GenerateLicense extends Component {
         this.closeError = this.closeError.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
         this.generateLicense = this.generateLicense.bind(this);
-        this.backToMain = this.backToMain.bind(this);
+        this.backToFront = this.backToFront.bind(this);
     }
 
     componentWillMount() {
@@ -67,7 +67,7 @@ class GenerateLicense extends Component {
 
         ServiceManager.getLicense().then((response) => {
             if (response.data.responseType === "done") {
-                ServiceManager.dowloadLicense().then((responseFile) => {
+                ServiceManager.downloadLicense().then((responseFile) => {
                     const url = window.URL.createObjectURL(new Blob([responseFile.data]));
                     const link = document.createElement('a');
                     const fileNameLength = this.state.packName.length;
@@ -138,7 +138,7 @@ class GenerateLicense extends Component {
     /**
      * Redirect to the main page.
      */
-    backToMain() {
+    backToFront() {
         this.props.history.push({
             pathname: '/'
         });
@@ -177,7 +177,7 @@ class GenerateLicense extends Component {
                     <RaisedButton
                         type="button"
                         label="Back to main"
-                        onClick={this.backToMain}
+                        onClick={this.backToFront}
                         style={styles.buttonStyle}
                     />
                 </form>

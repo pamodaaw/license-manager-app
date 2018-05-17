@@ -40,7 +40,8 @@ class ManageJars extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            packName: props.location.query.selectedPack,//eslint-disable-line
+
+            packName:props.location.query ? props.location.query.selectedPack: null,
             header: 'Define name and version of jars',
             nameMissingJars: [],
             openSaveData: false,
@@ -60,10 +61,13 @@ class ManageJars extends Component {
         this.setName = this.setName.bind(this);
         this.setVersion = this.setVersion.bind(this);
         this.redirectToNext = this.redirectToNext.bind(this);
+        this.backToMain = this.backToMain.bind(this);
     }
 
     componentWillMount() {
-
+        if (this.state.packName === null){
+            this.backToMain();
+        }
         ServiceManager.extractJars(this.state.packName).then((response) => {
             if (response.data.responseType === 'done') {
                 this.setState(() => {
@@ -75,18 +79,26 @@ class ManageJars extends Component {
                 let intervalID = setInterval(function () {
                     ServiceManager.checkProgress().then((responseNext) => {
                         if (responseNext.data.responseStatus === 'complete' && responseNext.data.responseType === 'done') {
-                            if (responseNext.data.responseData.length === 0) {
-                                this.redirectToNext();
-                            } else {
-                                this.setState(() => {
-                                    return {
-                                        nameMissingJars: responseNext.data.responseData,
-                                        displayProgress: 'none',
-                                        displayStatus: 'none',
-                                        displayForm: 'block',
-                                    };
-                                });
-                            }
+                            ServiceManager.getFaultyNamedJars().then((responseForFaultyJars) => {
+                                if (responseForFaultyJars.data.responseType === 'done') {
+                                    if (responseForFaultyJars.data.responseData.length === 0) {
+                                        this.redirectToNext();
+                                    } else {
+                                        this.setState(() => {
+                                            return {
+                                                nameMissingJars: responseForFaultyJars.data.responseData,
+                                                displayProgress: 'none',
+                                                displayStatus: 'none',
+                                                displayForm: 'block',
+                                            };
+                                        });
+                                    }
+                                } else {
+                                    this.handleError(responseForFaultyJars.data.responseMessage)
+                                }
+                            }).catch(() => {
+                                this.handleError("Network Error")
+                            });
                             clearTimeout(intervalID);
                         } else if (responseNext.data.responseStatus === 'running' && responseNext.data.responseType === 'done') {
                             this.setState(() => {
@@ -190,6 +202,14 @@ class ManageJars extends Component {
             };
         });
     }
+    /**
+     * reload page
+     */
+    backToMain() {
+        this.props.history.push({
+            pathname: '/packManager'
+        });
+    }
 
     /**
      * Redirect to the next page based on the response.
@@ -289,7 +309,7 @@ class ManageJars extends Component {
                         <RaisedButton
                             type="button"
                             label="Cancel"
-                            onClick={this.reloadPage}
+                            onClick={this.backToMain}
                             style={styles.saveButtonStyle}
                         />
                         <RaisedButton

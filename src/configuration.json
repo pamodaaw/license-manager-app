@@ -1,11 +1,4 @@
 {
-    "appServiceUrl1" : "http://localhost:9094/licenseManager/manageUser/",
-    "microServiceUrl1": "http://localhost:9094/",
-
     "appServiceUrl" : "https://identity-gateway.cloud.wso2.com/t/wso2internalstg/licenseManager/manageUser/",
-    "microServiceUrl" :"https://identity-gateway.cloud.wso2.com/t/wso2internalstg/licenseManager/manageLicense/",
-
-    "appServiceUrl2" : "http://10.100.0.106:9763/licenseManager/manageUser/",
-    "microServiceUrl2": "http://10.100.0.106:9763/licenseManager/manageLicense/"
-
+    "microServiceUrl" :"https://identity-gateway.cloud.wso2.com/t/wso2internalstg/licenseManager/manageLicense/"
 }

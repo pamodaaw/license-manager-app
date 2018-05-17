@@ -83,7 +83,7 @@ class GenerateLicense extends Component {
         this.setName = this.setName.bind(this);
         this.setVersion = this.setVersion.bind(this);
         this.generateLicense = this.generateLicense.bind(this);
-        this.backToMain = this.backToMain.bind(this);
+        this.backToFront = this.backToMain.bind(this);
         this.enterJarFunction = this.enterJarFunction.bind(this);
 
     }
@@ -336,7 +336,7 @@ class GenerateLicense extends Component {
         });
         /* eslint-disable */
         ServiceManager.getLicense().then((response) => {
-            ServiceManager.dowloadLicense().then((responseFile) => {
+            ServiceManager.downloadLicense().then((responseFile) => {
                 const url = window.URL.createObjectURL(new Blob([responseFile.data]));
                 const link = document.createElement('a');
                 const fileNameLength = this.state.packName.length;

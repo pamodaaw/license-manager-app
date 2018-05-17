@@ -42,8 +42,8 @@ class AddLicense extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            nameDefinedJars: this.props.location.state.nameMissingJars,
-            packName: this.props.location.state.packName,
+            nameDefinedJars: props.location.state ? props.location.state.nameMissingJars: null,
+            packName: props.location.state ? props.location.state.packName: null,
             errorMessageOpened: false,
             confirmMessageOpened: false,
             recheckMessageOpened: false,
@@ -53,7 +53,6 @@ class AddLicense extends Component {
             displayComponentTable: 'none',
             displayLibraryTable: 'none',
             checked: false,
-            isDataValid: false,
             header: 'Add Licenses for the jars',
             licenseMissingComponents: [],
             licenseMissingLibraries: [],
@@ -72,9 +71,13 @@ class AddLicense extends Component {
         this.handleError = this.handleError.bind(this);
         this.updateCheck = this.updateCheck.bind(this);
         this.validateFormData = this.validateFormData.bind(this);
+        this.backToMain = this.backToMain.bind(this);
     }
 
     componentWillMount() {
+        if(this.state.nameDefinedJars ==='' || this.state.packName === ''){
+            this.backToMain();
+        }
         ServiceManager.selectLicense().then((response) => {
             if (response.data.responseType === "done") {
                 if (response.data.responseData.length !== 0) {
@@ -161,9 +164,9 @@ class AddLicense extends Component {
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        this.validateFormData();
+        let isDataValid = this.validateFormData();
 
-        if (this.state.isDataValid) {
+        if (isDataValid) {
             this.setState(() => {
                 return {
                     confirmMessageOpened: true,
@@ -245,6 +248,7 @@ class AddLicense extends Component {
         const libraries = this.state.licenseMissingLibraries;
         let areAllComponentsFilled = true;
         let areAllLibrariesFilled = true;
+        let isDataValid = false;
         if (components.length > 0) {
             for (let i = 0; i < components.length; i++) {
                 if (components[i].licenseKey === "NEW") {
@@ -262,12 +266,9 @@ class AddLicense extends Component {
             }
         }
         if (areAllComponentsFilled && areAllLibrariesFilled) {
-            this.setState(() => {
-                return {
-                    isDataValid: true,
-                };
-            });
+            isDataValid = true
         }
+        return isDataValid;
     }
 
     /**
@@ -327,6 +328,15 @@ class AddLicense extends Component {
             return {
                 licenseMissingLibraries: lib,
             };
+        });
+    }
+
+    /**
+     * reload page
+     */
+    backToMain() {
+        this.props.history.push({
+            pathname: '/packManager'
         });
     }
 

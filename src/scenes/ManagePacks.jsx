@@ -179,7 +179,7 @@ class ManagePacks extends Component {
                         actions={actionsError}
                         modal={false}
                         open={this.state.errorMessageOpened}
-                        onRequestClose={this.backToMain}
+                        onRequestClose={this.backToFront}
                     >
                         {this.state.errorMessage}
                     </Dialog>
